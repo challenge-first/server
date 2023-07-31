@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
-@Entity(name = "auctions")
+@Entity
+@Table(name = "auctions")
 @Getter
 @Builder
 @NoArgsConstructor(access = PROTECTED)

@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
-@Entity(name = "members")
+@Entity
+@Table(name = "members")
 @Getter
 @Builder
 @NoArgsConstructor(access = PROTECTED)
