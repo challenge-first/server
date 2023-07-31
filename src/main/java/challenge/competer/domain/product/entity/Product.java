@@ -3,15 +3,13 @@ package challenge.competer.domain.product.entity;
 import challenge.competer.domain.product.productenum.MainCategory;
 import challenge.competer.domain.product.productenum.ProductState;
 import challenge.competer.domain.product.productenum.SubCategory;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -42,12 +40,15 @@ public class Product {
     @Column(nullable = false)
     private Integer likeCount;
 
+    @Enumerated(STRING)
     @Column(nullable = false)
     private ProductState productState;
 
+    @Enumerated(STRING)
     @Column(nullable = false)
     private MainCategory mainCategory;
 
+    @Enumerated(STRING)
     @Column(nullable = false)
     private SubCategory subCategory;
 
