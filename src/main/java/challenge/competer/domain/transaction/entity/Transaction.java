@@ -13,7 +13,8 @@ import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
-@Entity(name = "transactions")
+@Entity
+@Table(name = "transactions")
 @Getter
 @Builder
 @NoArgsConstructor(access = PROTECTED)
