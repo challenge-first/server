@@ -18,6 +18,7 @@ public class Auction {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
+
     @Column(name = "auction_id", nullable = false)
     private Long id;
 
