@@ -1,8 +1,10 @@
 package challenge.competer.global.log;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 public class LogTraceImpl implements LogTrace{
 
     private static final String START_PREFIX = "-->";
@@ -34,6 +36,9 @@ public class LogTraceImpl implements LogTrace{
         complete(status, e);
     }
 
+    /**
+     * else 문 변경
+     */
     private void syncTraceId() {
 
         TraceId traceId = traceIdHolder.get();
@@ -44,6 +49,12 @@ public class LogTraceImpl implements LogTrace{
             traceIdHolder.set(traceId.createNextId());
         }
     }
+
+    /**
+     * else 문 변경
+     * @param status
+     * @param e
+     */
 
     private void complete(TraceStatus status, Exception e) {
 
@@ -82,11 +93,25 @@ public class LogTraceImpl implements LogTrace{
         }
     }
 
+    /**
+     * else 문 변경
+     * @param prefix
+     * @param level
+     * @return
+     */
     private static String addSpace(String prefix, int level) {
+
         StringBuilder sb = new StringBuilder();
+
         for (int i = 0; i < level; i++) {
-            sb.append( (i == level - 1) ? "|" + prefix : "| ");
+            if (i != level - 1) {
+                sb.append("| ");
+            } else {
+                sb.append("|" + prefix);
+
+            }
         }
+
         return sb.toString();
     }
 }
