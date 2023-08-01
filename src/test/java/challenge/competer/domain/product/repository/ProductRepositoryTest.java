@@ -1,6 +1,7 @@
 package challenge.competer.domain.product.repository;
 
 import challenge.competer.domain.product.entity.Product;
+import challenge.competer.domain.product.productenum.ProductType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import static challenge.competer.domain.product.productenum.MainCategory.*;
 import static challenge.competer.domain.product.productenum.ProductState.*;
+import static challenge.competer.domain.product.productenum.ProductType.*;
 import static challenge.competer.domain.product.productenum.SubCategory.*;
 import static org.assertj.core.api.Assertions.*;
 
@@ -32,6 +34,7 @@ class ProductRepositoryTest {
                     .stockCount(i)
                     .productState(IN_STOCK)
                     .subCategory(LG)
+                    .productType(PRODUCT)
                     .build();
 
             productRepository.save(product);

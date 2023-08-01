@@ -79,6 +79,7 @@ class ProductControllerTest {
     }
 
     @Test
+    @DisplayName("상품 상세조회 테스트")
     void getDetailProductTest() throws Exception {
         //given
         ResponseDetailProductDto responseDetailProductDto = ResponseDetailProductDto.builder().build();
