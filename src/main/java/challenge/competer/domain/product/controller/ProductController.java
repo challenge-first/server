@@ -1,10 +1,12 @@
 package challenge.competer.domain.product.controller;
 
+import challenge.competer.domain.product.dto.ResponseDetailProductDto;
 import challenge.competer.domain.product.dto.ResponseProductDto;
 import challenge.competer.domain.product.productenum.MainCategory;
 import challenge.competer.domain.product.productenum.SubCategory;
 import challenge.competer.domain.product.service.ProductService;
 import challenge.competer.global.response.ResponseDataDto;
+import challenge.competer.global.response.ResponseMessageDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,14 @@ public class ProductController {
     public ResponseEntity<ResponseDataDto> getCategoryProducts(@PathVariable MainCategory mainCategory, @PathVariable SubCategory subCategory) {
         List<ResponseProductDto> responseProductDtos = productService.getCategoryPageProducts(mainCategory, subCategory);
         ResponseDataDto responseDataDto = new ResponseDataDto(responseProductDtos);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDataDto);
+    }
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<ResponseDataDto<ResponseDetailProductDto>> getDetailProduct(@PathVariable Long productId) {
+        ResponseDetailProductDto responseDetailProductDto = productService.getDetailProduct(productId);
+        ResponseDataDto<ResponseDetailProductDto> responseDataDto = new ResponseDataDto<>(responseDetailProductDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDataDto);
     }
