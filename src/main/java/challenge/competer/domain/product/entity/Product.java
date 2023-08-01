@@ -16,7 +16,6 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Table(name = "products")
 @Getter
-@Builder
 @NoArgsConstructor(access = PROTECTED)
 @AllArgsConstructor(access = PROTECTED)
 public class Product {
@@ -53,4 +52,16 @@ public class Product {
     @Column(nullable = false)
     private SubCategory subCategory;
 
+    @Builder
+    public Product(String name, Integer price, String content, Integer stockCount, ProductState productState, SubCategory subCategory) {
+        this.id = null;
+        this.name = name;
+        this.price = price;
+        this.content = content;
+        this.stockCount = stockCount;
+        this.likeCount = 0;
+        this.productState = productState;
+        this.mainCategory = subCategory.getParentCategory();
+        this.subCategory = subCategory;
+    }
 }
