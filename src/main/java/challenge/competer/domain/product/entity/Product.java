@@ -2,6 +2,7 @@ package challenge.competer.domain.product.entity;
 
 import challenge.competer.domain.product.productenum.MainCategory;
 import challenge.competer.domain.product.productenum.ProductState;
+import challenge.competer.domain.product.productenum.ProductType;
 import challenge.competer.domain.product.productenum.SubCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -52,8 +53,12 @@ public class Product {
     @Column(nullable = false)
     private SubCategory subCategory;
 
+    @Enumerated(STRING)
+    @Column(nullable = false)
+    private ProductType productType;
+
     @Builder
-    public Product(String name, Integer price, String content, Integer stockCount, ProductState productState, SubCategory subCategory) {
+    public Product(String name, Integer price, String content, Integer stockCount, ProductState productState, SubCategory subCategory, ProductType productType) {
         this.id = null;
         this.name = name;
         this.price = price;
@@ -63,5 +68,6 @@ public class Product {
         this.productState = productState;
         this.mainCategory = subCategory.getParentCategory();
         this.subCategory = subCategory;
+        this.productType = productType;
     }
 }
