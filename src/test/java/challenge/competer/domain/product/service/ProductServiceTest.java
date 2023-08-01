@@ -1,6 +1,7 @@
 package challenge.competer.domain.product.service;
 
 import challenge.competer.domain.image.entity.Image;
+import challenge.competer.domain.product.dto.ResponseDetailProductDto;
 import challenge.competer.domain.product.dto.ResponseProductDto;
 import challenge.competer.domain.product.entity.Product;
 import challenge.competer.domain.product.repository.ImageRepository;
@@ -26,7 +27,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@Transactional
 class ProductServiceTest {
 
     private Image defaultImage;
@@ -94,6 +94,22 @@ class ProductServiceTest {
 
         //then
         assertThat(findResponseProductDtos.size()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("상품 상세조회 테스트")
+    void getDetailProductTest() {
+        //given
+        when(imageRepository.findByProductId(any()))
+                .thenReturn(Optional.of(defaultImage));
+        when(productRepository.findById(any()))
+                .thenReturn(Optional.ofNullable(productList.get(0)));
+
+        //when
+        ResponseDetailProductDto responseDetailProductDto = productServiceImpl.getDetailProduct(any());
+
+        //then
+        assertThat(responseDetailProductDto.getName()).isEqualTo("name4");
     }
 
 }

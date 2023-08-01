@@ -1,8 +1,7 @@
 package challenge.competer.domain.product.controller;
 
+import challenge.competer.domain.product.dto.ResponseDetailProductDto;
 import challenge.competer.domain.product.dto.ResponseProductDto;
-import challenge.competer.domain.product.productenum.MainCategory;
-import challenge.competer.domain.product.productenum.SubCategory;
 import challenge.competer.domain.product.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -66,7 +65,8 @@ class ProductControllerTest {
     @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트")
     void getCategoryProductsTest() throws Exception {
         //given
-        when(productService.getCategoryPageProducts(LAPTOP, LG)).thenReturn(responseProductDtos);
+        when(productService.getCategoryPageProducts(LAPTOP, LG))
+                .thenReturn(responseProductDtos);
 
         //when, then
         mockMvc.perform(get("/products/main/maincategory/LAPTOP/subcategory/LG"))
@@ -76,6 +76,21 @@ class ProductControllerTest {
                 .andExpect(jsonPath("data").exists())
                 .andExpect(jsonPath("data").isArray())
                 .andExpect(jsonPath("data.length()").value(4));
+    }
+
+    @Test
+    void getDetailProductTest() throws Exception {
+        //given
+        ResponseDetailProductDto responseDetailProductDto = ResponseDetailProductDto.builder().build();
+        when(productService.getDetailProduct(any()))
+                .thenReturn(responseDetailProductDto);
+
+        //when, then
+        mockMvc.perform(get("/products/1"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("data").exists());
     }
 
 }
