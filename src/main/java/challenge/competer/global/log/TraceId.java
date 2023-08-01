@@ -5,8 +5,10 @@ import lombok.Getter;
 
 import java.util.UUID;
 
+import static lombok.AccessLevel.PROTECTED;
+
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = PROTECTED)
 public class TraceId {
 
     private String id;
