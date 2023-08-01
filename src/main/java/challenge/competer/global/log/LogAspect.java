@@ -1,10 +1,14 @@
 package challenge.competer.global.log;
 
+import challenge.competer.domain.member.dto.RequestMemberPointDto;
+import challenge.competer.domain.transaction.dto.RequestTransactionDto;
+import challenge.competer.global.auth.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
@@ -19,8 +23,25 @@ public class LogAspect {
     @Pointcut("execution(* challenge.competer.domain..*(..))")
     public void all() {}
 
+
+    @Pointcut("execution(* challenge.competer.domain.member.controller.MemberController.addPoint(..))")
+    public void point() {}
+
+    @Pointcut("execution(* challenge.competer.domain.transaction.controller.TransactionController.*(..))")
+    public void transaction() {}
+
+    @Before("point() && args(pointDto,memberDetails,..)")
+    public void logAddPoint(RequestMemberPointDto pointDto, MemberDetails memberDetails) {
+        log.info("[{}] point = {}", memberDetails.getUsername(), pointDto.getPoint());
+    }
+
+    @Before("transaction() && args(transactionDto,memberDetails,..)")
+    public void logTransaction(RequestTransactionDto transactionDto, MemberDetails memberDetails) {
+        log.info("[{}] transaction = {}", memberDetails.getUsername(),transactionDto.getPrice());
+    }
+
     @Around("all()")
-    public Object execute(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object logAll(ProceedingJoinPoint joinPoint) throws Throwable {
         TraceStatus status = null;
 
         try {
