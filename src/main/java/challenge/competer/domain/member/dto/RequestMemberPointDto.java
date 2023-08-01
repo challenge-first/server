@@ -9,5 +9,5 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public class RequestMemberPointDto {
 
-    private long point;
+    private Long point;
 }

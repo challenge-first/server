@@ -39,4 +39,7 @@ public class Member {
     @Column(nullable = false)
     private Long deposit;
 
+    public void addPoint(Long point) {
+        this.point += point;
+    }
 }
