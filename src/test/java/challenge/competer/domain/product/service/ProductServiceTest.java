@@ -29,6 +29,8 @@ import static org.mockito.Mockito.when;
 class ProductServiceTest {
 
     private Image defaultImage;
+    private Image subImage1;
+    private Image subImage2;
 
     private List<Product> productList = new ArrayList<>();
 
@@ -57,7 +59,21 @@ class ProductServiceTest {
         }
 
         defaultImage = Image.builder()
+                .id(1L)
+                .productId(4L)
                 .imageUrl("url")
+                .build();
+
+        subImage1 = Image.builder()
+                .id(2L)
+                .productId(4L)
+                .imageUrl("subUrl1")
+                .build();
+
+        subImage2 = Image.builder()
+                .id(3L)
+                .productId(4L)
+                .imageUrl("subUrl2")
                 .build();
 
     }
@@ -66,7 +82,7 @@ class ProductServiceTest {
     @DisplayName("메인 페이지 상품 4개 내림차순 조회 테스트")
     void getMainPageProductsTest() {
         //given
-        when(imageRepository.findByProductId(any()))
+        when(imageRepository.findFirstByProductId(any()))
                 .thenReturn(Optional.of(defaultImage));
         when(productRepository.findTop4ByOrderByIdDesc())
                 .thenReturn(productList);
@@ -83,7 +99,7 @@ class ProductServiceTest {
     @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트")
     void getCategoryPageProductsTest() {
         //given
-        when(imageRepository.findByProductId(any()))
+        when(imageRepository.findFirstByProductId(any()))
                 .thenReturn(Optional.of(defaultImage));
         when(productRepository.findTop4ByCategory(any(), any()))
                 .thenReturn(productList);
@@ -99,16 +115,22 @@ class ProductServiceTest {
     @DisplayName("상품 상세조회 테스트")
     void getDetailProductTest() {
         //given
-        when(imageRepository.findByProductId(any()))
-                .thenReturn(Optional.of(defaultImage));
+        List<Image> images = new ArrayList<>();
+        images.add(defaultImage);
+        images.add(subImage1);
+        images.add(subImage2);
+
+        when(imageRepository.findAllByProductId(any()))
+                .thenReturn(images);
         when(productRepository.findById(any()))
                 .thenReturn(Optional.ofNullable(productList.get(0)));
 
         //when
-        ResponseDetailProductDto responseDetailProductDto = productServiceImpl.getDetailProduct(any());
+        List<String> imageUrls = productServiceImpl.getDetailProduct(any()).getImageUrl();
 
         //then
-        assertThat(responseDetailProductDto.getName()).isEqualTo("name4");
+        assertThat(imageUrls.size()).isEqualTo(3);
+        assertThat(imageUrls.get(0)).isEqualTo("url");
     }
 
 }
