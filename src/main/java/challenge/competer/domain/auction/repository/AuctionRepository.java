@@ -1,4 +1,7 @@
 package challenge.competer.domain.auction.repository;
 
-public interface AuctionRepository {
+import challenge.competer.domain.auction.entity.Auction;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AuctionRepository extends JpaRepository<Auction, Long> {
 }

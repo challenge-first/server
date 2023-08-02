@@ -40,4 +40,7 @@ public class Auction {
     @Column(nullable = false)
     private LocalDateTime closingTime;
 
+    public void update (Long winningPrice) {
+        this.winningPrice = winningPrice;
+    }
 }

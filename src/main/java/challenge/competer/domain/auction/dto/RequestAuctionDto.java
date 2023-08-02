@@ -9,5 +9,5 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public class RequestAuctionDto {
 
-    private long point;
+    private Long point;
 }
