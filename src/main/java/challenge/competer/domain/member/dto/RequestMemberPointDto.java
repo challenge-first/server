@@ -10,4 +10,8 @@ import static lombok.AccessLevel.PROTECTED;
 public class RequestMemberPointDto {
 
     private Long point;
+
+    public RequestMemberPointDto(Long point) {
+        this.point = point;
+    }
 }
