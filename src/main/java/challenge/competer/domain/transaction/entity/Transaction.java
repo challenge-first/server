@@ -1,5 +1,7 @@
 package challenge.competer.domain.transaction.entity;
 
+import challenge.competer.domain.member.entity.Member;
+import challenge.competer.domain.product.entity.Product;
 import challenge.competer.domain.transaction.transactionstate.TransactionState;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-import static jakarta.persistence.EnumType.*;
+import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -26,11 +28,13 @@ public class Transaction {
     @Column(name = "transaction_id", nullable = false)
     private Long id;
 
-    @Column(nullable = false)
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
-    @Column(nullable = false)
-    private Long productId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @Column(nullable = false)
     private Integer transactionPrice;
