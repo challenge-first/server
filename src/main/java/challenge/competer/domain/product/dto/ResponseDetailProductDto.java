@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static lombok.AccessLevel.PROTECTED;
 
 @Getter
@@ -19,7 +22,7 @@ public class ResponseDetailProductDto {
     private String content;
     private Integer stockCount;
     private ProductState productState;
-    private String imageUrl;
+    private List<String> imageUrl = new ArrayList<>();
     private Integer likeCount;
 
 }

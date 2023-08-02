@@ -11,7 +11,9 @@ import challenge.competer.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
 
         return findProducts.stream()
                 .map(product -> {
-                    Image findImage = imageRepository.findByProductId(product.getId())
+                    Image findImage = imageRepository.findFirstByProductId(product.getId())
                             .orElseThrow(() -> new IllegalArgumentException("이미지가 없습니다."));
 
                     return createResponseProductDto(product, findImage);
@@ -40,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
 
         return findProducts.stream()
                 .map(product -> {
-                    Image findImage = imageRepository.findByProductId(product.getId())
+                    Image findImage = imageRepository.findFirstByProductId(product.getId())
                             .orElseThrow(() -> new IllegalArgumentException("이미지가 없습니다."));
 
                     return createResponseProductDto(product, findImage);
@@ -62,19 +64,26 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseDetailProductDto getDetailProduct(Long productId) {
         Product findProduct = productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("상품이 없습니다."));
-        Image findImage = imageRepository.findByProductId(productId).orElseThrow(() -> new IllegalArgumentException("이미지가 없습니다."));
+        List<Image> findImages = imageRepository.findAllByProductId(productId);
+        List<String> images = new ArrayList<>();
 
-        return createResponseDetailProductDto(findProduct, findImage);
+        if (findImages.isEmpty()) {
+            throw new IllegalArgumentException("이미지가 없습니다.");
+        }
+
+        findImages.forEach(image -> images.add(image.getImageUrl()));
+
+        return createResponseDetailProductDto(findProduct, images);
     }
 
-    private static ResponseDetailProductDto createResponseDetailProductDto(Product findProduct, Image findImage) {
+    private static ResponseDetailProductDto createResponseDetailProductDto(Product findProduct, List<String> images) {
         return ResponseDetailProductDto.builder()
                 .name(findProduct.getName())
                 .price(findProduct.getPrice())
                 .content(findProduct.getContent())
                 .stockCount(findProduct.getStockCount())
                 .productState(findProduct.getProductState())
-                .imageUrl(findImage.getImageUrl())
+                .imageUrl(images)
                 .likeCount(findProduct.getLikeCount())
                 .build();
     }
