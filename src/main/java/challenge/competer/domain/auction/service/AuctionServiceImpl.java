@@ -27,6 +27,12 @@ public class AuctionServiceImpl implements AuctionService {
         return createResponseWinningPriceDto(auction);
     }
 
+    private static ResponseWinningPriceDto createResponseWinningPriceDto(Auction auction) {
+        return ResponseWinningPriceDto.builder()
+                .winningPrice(auction.getWinningPrice())
+                .build();
+    }
+
     private static void validateAuctionCondition(RequestAuctionDto requestAuctionDto, Auction auction) {
         if (requestAuctionDto.getPoint() < auction.getOpeningPrice()) {
             throw new IllegalArgumentException("기본 입찰가보다 부족한 입찰 금액입니다");
@@ -39,12 +45,6 @@ public class AuctionServiceImpl implements AuctionService {
         if (requestAuctionDto.getTime().isAfter(auction.getClosingTime())) {
             throw new IllegalStateException("경매가 종료되었습니다");
         }
-    }
-
-    private static ResponseWinningPriceDto createResponseWinningPriceDto(Auction auction) {
-        return ResponseWinningPriceDto.builder()
-                .winningPrice(auction.getWinningPrice())
-                .build();
     }
 
 
