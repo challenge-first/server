@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static challenge.competer.domain.product.productenum.ProductState.*;
 import static jakarta.persistence.EnumType.*;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -79,7 +80,7 @@ public class Product {
 
     private void updateProductState() {
         if (this.stockCount == 0) {
-            this.productState = ProductState.SOLD_OUT;
+            this.productState = SOLD_OUT;
         }
     }
 }
