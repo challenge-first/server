@@ -15,16 +15,30 @@ public class AuctionServiceImpl implements AuctionService {
 
     private final AuctionRepository auctionRepository;
 
-    @Transactional
     @Override
+    @Transactional
     public ResponseWinningPriceDto bid(Long auctionId, RequestAuctionDto requestAuctionDto, MemberDetails memberDetails) {
 
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(() -> new IllegalArgumentException("상품이 없습니다"));
-        if (requestAuctionDto.getPoint() >= auction.getOpeningPrice() && requestAuctionDto.getPoint() >= auction.getWinningPrice()) {
-            auction.update(requestAuctionDto.getPoint());
-            return createResponseWinningPriceDto(auction);
+
+        validateAuctionCondition(requestAuctionDto, auction);
+        auction.update(requestAuctionDto.getPoint());
+
+        return createResponseWinningPriceDto(auction);
+    }
+
+    private static void validateAuctionCondition(RequestAuctionDto requestAuctionDto, Auction auction) {
+        if (requestAuctionDto.getPoint() < auction.getOpeningPrice()) {
+            throw new IllegalArgumentException("기본 입찰가보다 부족한 입찰 금액입니다");
         }
 
+        if (requestAuctionDto.getPoint() < auction.getWinningPrice()) {
+            throw new IllegalArgumentException("현재 입찰가보다 부족한 입찰 금액입니다");
+        }
+
+        if (requestAuctionDto.getTime().isAfter(auction.getClosingTime())) {
+            throw new IllegalStateException("경매가 종료되었습니다");
+        }
     }
 
     private static ResponseWinningPriceDto createResponseWinningPriceDto(Auction auction) {
