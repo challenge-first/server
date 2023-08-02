@@ -12,6 +12,7 @@ import challenge.competer.domain.product.repository.ImageRepository;
 import challenge.competer.domain.product.repository.ProductRepository;
 import challenge.competer.domain.transaction.service.TransactionServiceImpl;
 import challenge.competer.global.auth.MemberDetails;
+import challenge.competer.global.response.ResponseMessageDto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -78,5 +79,22 @@ class AuctionServiceTest {
                 .closingTime(LocalDateTime.now().plusHours(1))
                 .winningPrice(100L)
                 .build();
+    }
+
+    @Test
+    @DisplayName("경매 정보 조회")
+    void getAuctionTest() throws Exception {
+        //given
+        when(productRepository.findById(any()))
+                .thenReturn(Optional.of(product));
+        when(imageRepository.findFirstByProductId(any()))
+                .thenReturn(Optional.of(image));
+        when(auctionRepository.findByCurrentTime(any()))
+                .thenReturn(Optional.of(auction));
+
+        //when
+        ResponseAuctionDto responseDto = auctionServiceImpl.getAuction();
+        //then
+        assertThat(responseDto.getName()).isEqualTo("MacBook");
     }
 }
