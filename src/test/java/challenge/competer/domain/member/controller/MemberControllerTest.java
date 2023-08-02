@@ -61,9 +61,10 @@ class MemberControllerTest {
                 //then
                 .andExpect(status().isOk())
                 .andExpect(header().string(jwtProvider.getHEADER_NAME(),"AccessToken"))
-                .andExpect(jsonPath("$.message").value("로그인 완료"))
-                .andExpect(jsonPath("$.statusCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.statusMessage").value(HttpStatus.OK.toString()))
+                .andExpect(jsonPath("data").exists())
+                .andExpect(jsonPath("$.data.message").value("로그인 완료"))
+                .andExpect(jsonPath("$.data.statusCode").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.data.statusMessage").value(HttpStatus.OK.toString()))
                 .andDo(print());
     }
 
@@ -85,9 +86,10 @@ class MemberControllerTest {
 
                 //then
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("충전 완료"))
-                .andExpect(jsonPath("$.statusCode").value(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.statusMessage").value(HttpStatus.OK.toString()))
+                .andExpect(jsonPath("data").exists())
+                .andExpect(jsonPath("$.data.message").value("충전 완료"))
+                .andExpect(jsonPath("$.data.statusCode").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.data.statusMessage").value(HttpStatus.OK.toString()))
                 .andDo(print());
     }
 }
