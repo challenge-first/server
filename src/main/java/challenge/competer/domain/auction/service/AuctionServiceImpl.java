@@ -19,12 +19,12 @@ public class AuctionServiceImpl implements AuctionService {
     @Transactional
     public ResponseWinningPriceDto bid(Long auctionId, RequestAuctionDto requestAuctionDto, MemberDetails memberDetails) {
 
-        Auction auction = auctionRepository.findById(auctionId).orElseThrow(() -> new IllegalArgumentException("상품이 없습니다"));
+        Auction findAuction = auctionRepository.findById(auctionId).orElseThrow(() -> new IllegalArgumentException("상품이 없습니다"));
 
-        validateAuctionCondition(requestAuctionDto, auction);
-        auction.update(requestAuctionDto.getPoint());
+        validateAuctionCondition(requestAuctionDto, findAuction);
+        findAuction.update(requestAuctionDto.getPoint());
 
-        return createResponseWinningPriceDto(auction);
+        return createResponseWinningPriceDto(findAuction);
     }
 
     private static ResponseWinningPriceDto createResponseWinningPriceDto(Auction auction) {

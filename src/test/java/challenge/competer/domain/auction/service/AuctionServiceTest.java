@@ -1,42 +1,37 @@
 package challenge.competer.domain.auction.service;
 
+import challenge.competer.domain.auction.dto.RequestAuctionDto;
+import challenge.competer.domain.auction.dto.ResponseWinningPriceDto;
 import challenge.competer.domain.auction.entity.Auction;
 import challenge.competer.domain.auction.repository.AuctionRepository;
-import challenge.competer.domain.member.entity.Member;
-import challenge.competer.domain.member.repository.MemberRepository;
-import challenge.competer.domain.member.role.Role;
 import challenge.competer.domain.product.entity.Product;
 import challenge.competer.domain.product.productenum.ProductState;
 import challenge.competer.domain.product.productenum.SubCategory;
-import challenge.competer.domain.product.repository.ProductRepository;
 import challenge.competer.global.auth.MemberDetails;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
-@SpringBootTest
-@Transactional
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 class AuctionServiceTest {
 
-    private static Product product;
+    private  Product product;
 
-    private static Member member;
-
-    private static Auction auction;
+    private  Auction auction;
 
     @Mock
     private AuctionRepository auctionRepository;
-    @Mock
-    private MemberRepository memberRepository;
-    @Mock
-    private ProductRepository productRepository;
     @Mock
     MemberDetails memberDetails;
 
@@ -54,32 +49,29 @@ class AuctionServiceTest {
                 .name("MacBook")
                 .build();
 
-        member = Member.builder()
-                .id(1L)
-                .username("userA")
-                .password("passwordA")
-                .deposit(0L)
-                .point(10000L)
-                .role(Role.MEMBER)
-                .build();
 
         auction = Auction.builder()
                 .id(1L)
+                .productId(product.getId())
                 .memberId(1L)
                 .openingPrice(5000L)
-                .openingTime(LocalDateTime.of(2020,12,17,6,30))
-                .closingTime(LocalDateTime.of(2024,12,17,6,30))
+                .openingTime(LocalDateTime.now().minusHours(1))
+                .closingTime(LocalDateTime.now().plusHours(1))
                 .winningPrice(9000L)
                 .build();
     }
 
-
     @Test
-    @DisplayName("Normal bid")
-    public void normal() {
-        Mockito.when()
+    @DisplayName("bid Success")
+    public void bidSuccess() {
+
+        RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now());
+
+        when(auctionRepository.findById(any()))
+                .thenReturn(Optional.of(auction));
+
+        ResponseWinningPriceDto response = auctionService.bid(1L, request, memberDetails);
+
+        Assertions.assertThat(response.getWinningPrice()).isEqualTo(10000L);
     }
-
-
-
 }
