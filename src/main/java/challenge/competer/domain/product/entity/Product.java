@@ -53,4 +53,16 @@ public class Product {
     @Column(nullable = false)
     private SubCategory subCategory;
 
+    public void decreaseStockCount() {
+        if (this.stockCount > 0) {
+            this.stockCount--;
+        }
+        updateProductState();
+    }
+
+    private void updateProductState() {
+        if (this.stockCount == 0) {
+            this.productState = ProductState.SOLD_OUT;
+        }
+    }
 }
