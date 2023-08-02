@@ -73,10 +73,10 @@ class AuctionServiceTest {
                 .id(1L)
                 .memberId(1L)
                 .productId(product.getId())
-                .openingPrice(100L)
+                .openingPrice(3000L)
                 .openingTime(LocalDateTime.now().minusMinutes(1))
                 .closingTime(LocalDateTime.now().plusHours(1))
-                .winningPrice(100L)
+                .winningPrice(6000L)
                 .build();
     }
 
@@ -99,7 +99,7 @@ class AuctionServiceTest {
     }
 
     @Test
-    @DisplayName("bid Success")
+    @DisplayName("입찰 성공 테스트")
     public void bidSuccess() {
 
         RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now());
@@ -110,5 +110,53 @@ class AuctionServiceTest {
         ResponseWinningPriceDto response = auctionServiceImpl.bid(1L, request, memberDetails);
 
         Assertions.assertThat(response.getWinningPrice()).isEqualTo(10000L);
+    }
+
+    @Test
+    @DisplayName("현재 입찰가 실패 테스트")
+    public void bidFailCausedByWinningPrice() {
+
+        RequestAuctionDto request = new RequestAuctionDto(5000L, LocalDateTime.now());
+
+        when(auctionRepository.findById(any()))
+                .thenReturn(Optional.of(auction));
+
+        try {
+            auctionServiceImpl.bid(1L, request, memberDetails);
+        } catch (IllegalArgumentException e) {
+            Assertions.assertThat(e.getMessage()).isEqualTo("현재 입찰가보다 부족한 입찰 금액입니다");
+        }
+    }
+
+    @Test
+    @DisplayName("기본 입찰가 실패 테스트")
+    public void bidFailCausedByOpeningPrice() {
+
+        RequestAuctionDto request = new RequestAuctionDto(2000L, LocalDateTime.now());
+
+        when(auctionRepository.findById(any()))
+                .thenReturn(Optional.of(auction));
+
+        try {
+            auctionServiceImpl.bid(1L, request, memberDetails);
+        } catch (IllegalArgumentException e) {
+            Assertions.assertThat(e.getMessage()).isEqualTo("기본 입찰가보다 부족한 입찰 금액입니다");
+        }
+    }
+
+    @Test
+    @DisplayName("마감시간 초과 테스트")
+    public void bidFailCausedByClosingTime() {
+
+        RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now().plusHours(6));
+
+        when(auctionRepository.findById(any()))
+                .thenReturn(Optional.of(auction));
+
+        try {
+            auctionServiceImpl.bid(1L, request, memberDetails);
+        } catch (IllegalStateException e) {
+            Assertions.assertThat(e.getMessage()).isEqualTo("경매가 종료되었습니다");
+        }
     }
 }
