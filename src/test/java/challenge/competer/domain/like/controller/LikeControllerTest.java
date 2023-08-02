@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class LikeControllerTest {
 
     ResponseMessageDto createLikeResponseMessageDto;
-    ResponseMessageDto cencelLikeResponseMessageDto;
+    ResponseMessageDto cancelLikeResponseMessageDto;
 
     @Autowired
     MockMvc mockMvc;
@@ -35,7 +35,7 @@ class LikeControllerTest {
     @BeforeEach
     void beforeEach() {
         createLikeResponseMessageDto = new ResponseMessageDto("좋아요 완료", 200, "OK");
-        cencelLikeResponseMessageDto = new ResponseMessageDto("좋아요 취소", 200, "OK");
+        cancelLikeResponseMessageDto = new ResponseMessageDto("좋아요 취소", 200, "OK");
     }
 
     @Test
@@ -62,7 +62,7 @@ class LikeControllerTest {
     void toggleLikeCancelTest() throws Exception {
         //given
         when(likeService.toggleLike(any(), any()))
-                .thenReturn(cencelLikeResponseMessageDto);
+                .thenReturn(cancelLikeResponseMessageDto);
 
         //when, then
         mockMvc.perform(post("/likes/products/2")
