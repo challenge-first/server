@@ -60,11 +60,8 @@ class TransactionServiceTest {
         int price = 10_000;
 
         product = Product.builder()
-                .id(1L)
                 .content("content")
                 .productState(ProductState.IN_STOCK)
-                .mainCategory(MainCategory.LAPTOP)
-                .likeCount(0)
                 .subCategory(SubCategory.APPLE)
                 .price(10_000)
                 .stockCount(2)
@@ -72,11 +69,8 @@ class TransactionServiceTest {
                 .build();
 
         zeroStuckProduct = Product.builder()
-                .id(2L)
                 .content("content")
                 .productState(ProductState.SOLD_OUT)
-                .mainCategory(MainCategory.LAPTOP)
-                .likeCount(0)
                 .subCategory(SubCategory.SAMSUNG)
                 .price(10_000)
                 .stockCount(0)
