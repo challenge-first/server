@@ -1,6 +1,7 @@
 package challenge.competer.domain.auction.controller;
 
 import challenge.competer.domain.auction.dto.RequestAuctionDto;
+import challenge.competer.domain.auction.dto.ResponseAuctionDto;
 import challenge.competer.domain.auction.dto.ResponseWinningPriceDto;
 import challenge.competer.domain.auction.service.AuctionService;
 import challenge.competer.global.auth.LoginMember;
@@ -9,16 +10,20 @@ import challenge.competer.global.response.ResponseDataDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 public class AuctionController {
 
     private final AuctionService auctionService;
+
+    @GetMapping("/auctions")
+    public ResponseEntity<ResponseDataDto> getAuction() {
+
+        ResponseDataDto<ResponseAuctionDto> response = new ResponseDataDto<>(auctionService.getAuction());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     @PostMapping("/auctions/{auctionId}")
     public ResponseEntity<ResponseDataDto> bid(@PathVariable Long auctionId,
