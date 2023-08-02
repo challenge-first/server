@@ -1,0 +1,29 @@
+2023-08-02 15:57:16,142 [main] INFO  - Could not detect default configuration classes for test class [challenge.competer.global.log.LogTraceImplTest]: LogTraceImplTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2023-08-02 15:57:16,345 [main] INFO  - Found @SpringBootConfiguration challenge.competer.CompeterApplication for test class challenge.competer.global.log.LogTraceImplTest
+2023-08-02 15:57:19,896 [main] INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-08-02 15:57:20,452 [main] INFO  - Finished Spring Data repository scanning in 503 ms. Found 4 JPA repository interfaces.
+2023-08-02 15:57:22,160 [main] WARN  - Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: challenge.competer.global.log.LogAspect
+2023-08-02 15:57:22,166 [main] WARN  - Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: challenge.competer.global.log.LogAspect
+2023-08-02 15:57:28,222 [main] INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-08-02 15:57:29,634 [main] WARN  - Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: challenge.competer.domain.like.repository.LikeRepository
+2023-08-02 15:57:30,110 [main] WARN  - Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: challenge.competer.domain.member.repository.MemberRepository
+2023-08-02 15:57:31,211 [main] WARN  - Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: challenge.competer.domain.product.repository.ImageRepository
+2023-08-02 15:57:31,864 [main] WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-08-02 15:57:32,765 [main] INFO  - H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:testdb'
+2023-08-02 15:57:33,500 [SpringApplicationShutdownHook] INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-08-02 16:06:18,121 [main] INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-08-02 16:06:18,281 [main] INFO  - Finished Spring Data repository scanning in 139 ms. Found 4 JPA repository interfaces.
+2023-08-02 16:06:18,592 [main] WARN  - Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: challenge.competer.global.log.LogAspect
+2023-08-02 16:06:18,594 [main] WARN  - Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: challenge.competer.global.log.LogAspect
+2023-08-02 16:06:19,097 [main] INFO  - Tomcat initialized with port(s): 8080 (http)
+2023-08-02 16:06:19,297 [main] INFO  - Root WebApplicationContext: initialization completed in 2065 ms
+2023-08-02 16:06:19,660 [main] INFO  - H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:testdb'
+2023-08-02 16:06:21,501 [main] INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-08-02 16:06:21,804 [main] WARN  - Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: challenge.competer.domain.member.repository.MemberRepository
+2023-08-02 16:06:22,073 [main] WARN  - Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: challenge.competer.domain.like.repository.LikeRepository
+2023-08-02 16:06:22,456 [main] WARN  - Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: challenge.competer.domain.product.repository.ImageRepository
+2023-08-02 16:06:22,521 [main] WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-08-02 16:06:22,973 [main] INFO  - Tomcat started on port(s): 8080 (http) with context path ''
+2023-08-02 16:07:06,404 [http-nio-8080-exec-1] INFO  - Initializing Servlet 'dispatcherServlet'
+2023-08-02 16:07:06,407 [http-nio-8080-exec-1] INFO  - Completed initialization in 1 ms
+2023-08-02 16:07:27,166 [SpringApplicationShutdownHook] INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'

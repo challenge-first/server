@@ -15,7 +15,6 @@ public class LogTraceImpl implements LogTrace{
 
     @Override
     public TraceStatus begin(String message) {
-
         syncTraceId();
         
         TraceId traceId = traceIdHolder.get();
@@ -36,28 +35,19 @@ public class LogTraceImpl implements LogTrace{
         complete(status, e);
     }
 
-    /**
-     * else 문 변경
-     */
     private void syncTraceId() {
-
         TraceId traceId = traceIdHolder.get();
 
         if (traceId == null) {
             traceIdHolder.set(new TraceId());
-        } else {
+        }
+
+        if (traceId != null) {
             traceIdHolder.set(traceId.createNextId());
         }
     }
 
-    /**
-     * else 문 변경
-     * @param status
-     * @param e
-     */
-
     private void complete(TraceStatus status, Exception e) {
-
         Long stopTime = System.currentTimeMillis();
         long elapsedTime = stopTime - status.getStartTime();
 
@@ -69,8 +59,9 @@ public class LogTraceImpl implements LogTrace{
                     addSpace(COMPLETE_PREFIX, traceId.getLevel()),
                     status.getMessage(),
                     elapsedTime);
+        }
 
-        } else {
+        if (e != null) {
             log.info("[{}] {}{} time={} ex={}",
                     traceId.getId(),
                     addSpace(EX_PREFIX, traceId.getLevel()),
@@ -83,9 +74,7 @@ public class LogTraceImpl implements LogTrace{
     }
 
     private void releaseTraceId() {
-
         TraceId traceId = traceIdHolder.get();
-
         traceIdHolder.set(traceId.createPreviousId());
 
         if (traceId.isFirstLevel()) {
@@ -93,22 +82,16 @@ public class LogTraceImpl implements LogTrace{
         }
     }
 
-    /**
-     * else 문 변경
-     * @param prefix
-     * @param level
-     * @return
-     */
     private static String addSpace(String prefix, int level) {
-
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < level; i++) {
             if (i != level - 1) {
                 sb.append("| ");
-            } else {
-                sb.append("|" + prefix);
+            }
 
+            if (i == level - 1) {
+                sb.append("|" + prefix);
             }
         }
 

@@ -3,11 +3,11 @@
 
     <!--공통 속성 설정 -->
     <Properties>
-        <Property name="logFileName">log4j2-log</Property>
-        <Property name="logFileName-AOP">log4j2AOP-log</Property>
-        <Property name="BASE_DIR">C:/log</Property>
+        <Property name="logFileName">BasicLog</Property>
+        <Property name="logFileName-AOP">AOPLog</Property>
+        <Property name="BASE_DIR">./logs</Property>
         <Property name="consoleLayout">[%d{yyyy-MM-dd HH:mm:ss}] [%-5p] [%c{1}:%L] - %m%n</Property>
-        <Property name="fileLayout">%d [%t] %-5level %c(%M:%L) - %m%n</Property>
+        <Property name="fileLayout">%d [%t] %-5level - %m%n</Property>
     </Properties>
 
     <!-- Log Appender 설정 -->
@@ -19,9 +19,11 @@
         </Console>
 
         <!--파일 패턴 및 정책 정의 -->
-        <RollingFile name="file"
-                     fileName="logs/${logFileName}.log"
-                     filePattern="logs/${logFileName}.%d{yyyy-MM-dd-hh}.log">
+
+        <!-- 로그를 추가할 파일 Appender -->
+        <RollingFile name="File"
+                     fileName="${BASE_DIR}/${logFileName}.log"
+                     filePattern="${BASE_DIR}/${logFileName}.%d{yyyy-MM-dd-hh}.log">
             <PatternLayout pattern="${fileLayout}" />
 
             <Policies>
@@ -36,9 +38,9 @@
         </RollingFile>
 
         <!-- "AOP"를 통해 로그를 추가할 파일 Appender -->
-        <RollingFile name="aopFile"
-                     fileName="logs/${logFileName-AOP}.log"
-                     filePattern="logs/${logFileName-AOP}.%d{yyyy-MM-dd-hh}.log">
+        <RollingFile name="AOPFile"
+                     fileName="${BASE_DIR}/${logFileName-AOP}.log"
+                     filePattern="${BASE_DIR}/${logFileName-AOP}.%d{yyyy-MM-dd-hh}.log">
             <PatternLayout pattern="${fileLayout}" />
             <Policies>
                 <TimeBasedTriggeringPolicy modulate="true" interval="24" />
@@ -51,8 +53,23 @@
         </RollingFile>
 
 
-    </Appenders>
+        <!-- "warn" 레벨 로그를 추가할 파일 Appender -->
+        <RollingFile name="daily_errorFile"
+                     fileName="${BASE_DIR}/error/error.log"
+                     filePattern="${BASE_DIR}/error/error.%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${fileLayout}" />
+            <LevelRangeFilter minLevel="error" maxLevel="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="20 MB" />
+            </Policies>
+            <DefaultRolloverstrategy>
+                <Delete basePath="${BASE_DIR}" maxDepth="3">
+                    <IfLastModified age="10d" />
+                </Delete>
+            </DefaultRolloverstrategy>
+        </RollingFile>
 
+    </Appenders>
 
     <!--로그 설정-->
     <Loggers>
@@ -60,26 +77,30 @@
         <!-- 스프링 프레임워크에서 실행될 때 로거 설정 -->
         <logger name="org.springframework" level="info" additivity="false" >
             <AppenderRef ref="console" />
-            <AppenderRef ref="file" />
+            <AppenderRef ref="File" />
         </logger>
 
         <!-- "AOP"를 적용할 패키지 또는 클래스에 대한 로거 설정 -->
         <logger name="challenge.competer.global.log.LogAspect" level="debug" additivity="false">
             <AppenderRef ref="console" />
-            <AppenderRef ref="aopFile" />
+            <AppenderRef ref="AOPFile" />
         </logger>
 
-        <!-- "LogTrace"만 적용할 패키지 또는 클래스에 대한 로거 설정 -->
         <logger name="challenge.competer.global.log.LogTraceImpl" level="debug" additivity="false">
             <AppenderRef ref="console" />
-            <AppenderRef ref="aopFile" />
+            <AppenderRef ref="AOPFile" />
+        </logger>
+
+        <!-- "error" 레벨 로거 설정 -->
+        <logger name="challenge.competer.domain" level="error" additivity="true" >
+            <AppenderRef ref="daily_errorFile" />
         </logger>
 
         <!-- ROOT logger-->
         <!-- off, fatal, error, warn, info, debug, trace, all -->
-        <Root level="fatal" additivity="false">
-            <AppenderRef ref="file"/>
-            <AppenderRef ref="aopFile" />
+        <Root level="error" additivity="false">
+            <AppenderRef ref="File"/>
+            <AppenderRef ref="AOPFile" />
             <AppenderRef ref="console" />
         </Root>
     </Loggers>

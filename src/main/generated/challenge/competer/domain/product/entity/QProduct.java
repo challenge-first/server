@@ -33,6 +33,8 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final EnumPath<challenge.competer.domain.product.productenum.ProductState> productState = createEnum("productState", challenge.competer.domain.product.productenum.ProductState.class);
 
+    public final EnumPath<challenge.competer.domain.product.productenum.ProductType> productType = createEnum("productType", challenge.competer.domain.product.productenum.ProductType.class);
+
     public final NumberPath<Integer> stockCount = createNumber("stockCount", Integer.class);
 
     public final EnumPath<challenge.competer.domain.product.productenum.SubCategory> subCategory = createEnum("subCategory", challenge.competer.domain.product.productenum.SubCategory.class);
