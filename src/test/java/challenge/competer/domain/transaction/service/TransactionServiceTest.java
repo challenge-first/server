@@ -56,15 +56,13 @@ class TransactionServiceTest {
 
     @BeforeAll
     public static void beforeAll() {
-        int price = 10_000;
+        int price = 10;
 
         product = Product.builder()
                 .content("content")
                 .productState(ProductState.IN_STOCK)
-                .content("content")
-                .productState(ProductState.IN_STOCK)
                 .subCategory(SubCategory.APPLE)
-                .price(10_000)
+                .price(10)
                 .stockCount(2)
                 .name("MacBook")
                 .build();
@@ -72,10 +70,8 @@ class TransactionServiceTest {
         zeroStuckProduct = Product.builder()
                 .content("content")
                 .productState(ProductState.SOLD_OUT)
-                .content("content")
-                .productState(ProductState.SOLD_OUT)
                 .subCategory(SubCategory.SAMSUNG)
-                .price(10_000)
+                .price(10)
                 .stockCount(0)
                 .name("samsung")
                 .build();
@@ -137,6 +133,7 @@ class TransactionServiceTest {
                 .thenReturn(member.getId());
         when(transactionRepository.save(any()))
                 .thenReturn(transaction);
+
         //when
         ResponseMessageDto responseMessageDto = transactionServiceImpl.payment(1L, requestDto, memberDetails);
         //then
@@ -155,6 +152,7 @@ class TransactionServiceTest {
                 .thenReturn(zeroPointMember.getId());
         when(transactionRepository.save(any()))
                 .thenReturn(zeroPointFailTransaction);
+
         //when
         ResponseMessageDto responseMessageDto = transactionServiceImpl.payment(1L, requestDto, memberDetails);
         //then
@@ -188,11 +186,11 @@ class TransactionServiceTest {
         when(productRepository.findById(any()))
                 .thenReturn(Optional.of(product));
         when(memberDetails.getPoint())
-                .thenReturn(member.getPoint());
+                .thenReturn(zeroPointMember.getPoint());
 
         //when
         ResponseDataDto<ResponseTransactionDto> responseDataDto = transactionServiceImpl.getTransaction(1L, memberDetails);
         //then
-        assertThat(responseDataDto.getData().getCurrentPoint()).isEqualTo(0L);
+        assertThat(responseDataDto.getData().getCurrentPoint()).isEqualTo(-10);
     }
 }
