@@ -16,8 +16,8 @@ class JwtProviderTest {
     @BeforeEach
     void setUp() {
         jwtProvider = new JwtProvider(
-            "ZDQ0NDYzMjJjMjc2Y2ExY2ZjMjYyYmY5MjcyYWNmNGIxZWYwMTBlM2Y2MzNkYjA1MjE5ODE2Mjc4MjU2NTBkZTBlNjViMjg5OWM1NzJjODMyZjVmOWRmNDYxYTZlMzAyOWVmNDQxMjgxMWJhMTEyN2IzNmE5ZjY5OTMwM2UyZTQNCg==",
-            600000);
+                "testSecreyKeytestSecreyKeytestSecreyKeytestSecreyKeytestSecreyKeytestSecreyKeytestSecreyKey",
+                600000);
     }
 
     @DisplayName("Jwt Token이 생성된다.")
@@ -46,8 +46,8 @@ class JwtProviderTest {
     void getPayloadWithInvalidToken() throws Exception {
 
         assertThatThrownBy(() -> jwtProvider.extractToken(null))
-            .hasMessage("유효하지 않은 JWT 입니다.")
-            .isInstanceOf(TokenValidException.class);
+                .hasMessage("유효하지 않은 JWT 입니다.")
+                .isInstanceOf(TokenValidException.class);
     }
 
     @DisplayName("토큰의 인증타입이 Bearer 이 아니면 예외가 발생한다.")
@@ -63,8 +63,8 @@ class JwtProviderTest {
         String invalidAccessToken = invalidPrefix+token;
 
         assertThatThrownBy(() -> jwtProvider.extractToken(invalidAccessToken))
-            .hasMessage("유효하지 않은 JWT 입니다.")
-            .isInstanceOf(TokenValidException.class);
+                .hasMessage("유효하지 않은 JWT 입니다.")
+                .isInstanceOf(TokenValidException.class);
     }
 
     @DisplayName("만료된 토큰은 예외가 발생한다.")
@@ -72,14 +72,14 @@ class JwtProviderTest {
     void expireToken() throws Exception {
         Long memberId = 1L;
         Role role = Role.MEMBER;
-        JwtProvider invalidJwtProvider = new JwtProvider("ZDQ0NDYzMjJjMjc2Y2ExY2ZjMjYyYmY5MjcyYWNmNGIxZWYwMTBlM2Y2MzNkYjA1MjE5ODE2Mjc4MjU2NTBkZTBlNjViMjg5OWM1NzJjODMyZjVmOWRmNDYxYTZlMzAyOWVmNDQxMjgxMWJhMTEyN2IzNmE5ZjY5OTMwM2UyZTQNCg==", -100);
+        JwtProvider invalidJwtProvider = new JwtProvider("testSecreyKeytestSecreyKeytestSecreyKeytestSecreyKeytestSecreyKeytestSecreyKeytestSecreyKey", -100);
 
         String createdToken = invalidJwtProvider.createAccessToken(memberId, role);
         String invalidToken = jwtProvider.extractToken(createdToken);
 
         assertThatThrownBy(() -> jwtProvider.validateToken(invalidToken))
-            .hasMessage("만료된 JWT 입니다.")
-            .isInstanceOf(TokenValidException.class);
+                .hasMessage("만료된 JWT 입니다.")
+                .isInstanceOf(TokenValidException.class);
     }
 
     @DisplayName("잘못된 시크릿 키로 만들어진 토큰이 입력되면 예외가 발생한다.")
@@ -87,13 +87,13 @@ class JwtProviderTest {
     void invalidSecretKey() throws Exception {
         Long memberId = 1L;
         Role role = Role.MEMBER;
-        JwtProvider invalidJwtProvider = new JwtProvider("ZDyZjVmOWRmNDYxYTZlMzAyOWVmNDQxMjgxMWJhMTEyN2IzNmE5ZjY5OTMwM2UyZTQNCg==", -100);
+        JwtProvider invalidJwtProvider = new JwtProvider("InvalidSecretKeyInvalidSecretKeyInvalidSecretKeyInvalidSecretKeyInvalidSecretKey", -100);
 
         String createdToken = invalidJwtProvider.createAccessToken(memberId, role);
         String invalidToken = jwtProvider.extractToken(createdToken);
 
         assertThatThrownBy(() -> jwtProvider.validateToken(invalidToken))
-            .hasMessage("유효하지 않은 JWT 서명 입니다.")
-            .isInstanceOf(TokenValidException.class);
+                .hasMessage("유효하지 않은 JWT 서명 입니다.")
+                .isInstanceOf(TokenValidException.class);
     }
 }
