@@ -2,9 +2,9 @@ package challenge.competer.global.log;
 
 import challenge.competer.domain.member.dto.RequestMemberPointDto;
 import challenge.competer.domain.transaction.dto.RequestTransactionDto;
-import challenge.competer.global.auth.MemberDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -30,14 +30,14 @@ public class LogAspect {
     @Pointcut("execution(* challenge.competer.domain.transaction.controller.TransactionController.*(..))")
     public void transaction() {}
 
-    @Before("point() && args(pointDto,memberDetails,..)")
-    public void logAddPoint(RequestMemberPointDto pointDto, MemberDetails memberDetails) {
-        log.info("[{}] point = {}", memberDetails.getUsername(), pointDto.getPoint());
+    @Before("point() && args(pointDto,..)")
+    public void logAddPoint(JoinPoint joinPoint, RequestMemberPointDto pointDto) {
+        log.info("[{}] point = {}", joinPoint.getSignature().getName(), pointDto.getPoint());
     }
 
-    @Before("transaction() && args(transactionDto,memberDetails,..)")
-    public void logTransaction(RequestTransactionDto transactionDto, MemberDetails memberDetails) {
-        log.info("[{}] transaction = {}", memberDetails.getUsername(),transactionDto.getPrice());
+    @Before("transaction() && args(productId, transactionDto,..)")
+    public void logTransaction(JoinPoint joinPoint, Long productId, RequestTransactionDto transactionDto) {
+        log.info("[{}] productId = {}, price = {}" , joinPoint.getSignature().getName(), productId, transactionDto.getPrice());
     }
 
     @Around("all()")
