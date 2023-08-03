@@ -1,5 +1,6 @@
 package challenge.competer.domain.member.controller;
 
+import challenge.competer.global.response.ResponseDataDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,22 +27,25 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseMessageDto> login(@RequestBody RequestMemberLoginDto requestDto) {
+    public ResponseEntity<ResponseDataDto> login(@RequestBody RequestMemberLoginDto requestDto) {
         ResponseTokenDto loginResponse = memberService.login(requestDto);
-        ResponseMessageDto responseBody = new ResponseMessageDto("로그인 완료", HttpStatus.OK.value(), HttpStatus.OK.toString());
+        ResponseMessageDto responseMessage = new ResponseMessageDto("로그인 완료", HttpStatus.OK.value(), HttpStatus.OK.toString());
 
+        ResponseDataDto<ResponseMessageDto> response = new ResponseDataDto<>(responseMessage);
         return ResponseEntity.status(HttpStatus.OK)
             .header(loginResponse.getHeaderName(),loginResponse.getAccessTokenValue())
-            .body(responseBody);
+            .body(response);
     }
 
     @PostMapping("/point")
-    public ResponseEntity<ResponseMessageDto> addPoint(@RequestBody RequestMemberPointDto requestDto, @LoginMember MemberDetails memberDetails) {
-        return ResponseEntity.status(HttpStatus.OK).body(memberService.addPoint(requestDto, memberDetails));
+    public ResponseEntity<ResponseDataDto> addPoint(@RequestBody RequestMemberPointDto requestDto, @LoginMember MemberDetails memberDetails) {
+        ResponseDataDto<ResponseMessageDto> response = new ResponseDataDto<>(memberService.addPoint(requestDto, memberDetails));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/point")
-    public ResponseEntity<ResponsePointDto> getPoint(@LoginMember MemberDetails memberDetails) {
-        return ResponseEntity.status(HttpStatus.OK).body(memberService.getPoint(memberDetails));
+    public ResponseEntity<ResponseDataDto> getPoint(@LoginMember MemberDetails memberDetails) {
+        ResponseDataDto<ResponsePointDto> response = new ResponseDataDto<>(memberService.getPoint(memberDetails));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

@@ -4,7 +4,6 @@ import challenge.competer.domain.member.entity.Member;
 import challenge.competer.domain.member.repository.MemberRepository;
 import challenge.competer.domain.member.role.Role;
 import challenge.competer.domain.product.entity.Product;
-import challenge.competer.domain.product.productenum.MainCategory;
 import challenge.competer.domain.product.productenum.ProductState;
 import challenge.competer.domain.product.productenum.SubCategory;
 import challenge.competer.domain.product.repository.ProductRepository;
@@ -62,6 +61,8 @@ class TransactionServiceTest {
         product = Product.builder()
                 .content("content")
                 .productState(ProductState.IN_STOCK)
+                .content("content")
+                .productState(ProductState.IN_STOCK)
                 .subCategory(SubCategory.APPLE)
                 .price(10_000)
                 .stockCount(2)
@@ -69,6 +70,8 @@ class TransactionServiceTest {
                 .build();
 
         zeroStuckProduct = Product.builder()
+                .content("content")
+                .productState(ProductState.SOLD_OUT)
                 .content("content")
                 .productState(ProductState.SOLD_OUT)
                 .subCategory(SubCategory.SAMSUNG)
