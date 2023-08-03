@@ -151,7 +151,7 @@ class MemberServiceTest {
         assertThat(response.getPoint()).isEqualTo(currentPoint);
     }
 
-    private static Member createMember(Long memberId, String memberName, String password, Long currentPoint) {
+    private Member createMember(Long memberId, String memberName, String password, Long currentPoint) {
         Member member = Member.builder()
                 .id(memberId)
                 .username(memberName)
