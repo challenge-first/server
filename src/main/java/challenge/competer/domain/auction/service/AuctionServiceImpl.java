@@ -48,7 +48,6 @@ public class AuctionServiceImpl implements AuctionService {
         return responseDto;
     }
 
-
     @Override
     @Transactional
     public ResponseWinningPriceDto bid(Long auctionId, RequestAuctionDto requestAuctionDto, MemberDetails memberDetails) {
@@ -61,13 +60,13 @@ public class AuctionServiceImpl implements AuctionService {
         return createResponseWinningPriceDto(findAuction);
     }
 
-    private static ResponseWinningPriceDto createResponseWinningPriceDto(Auction auction) {
+    private ResponseWinningPriceDto createResponseWinningPriceDto(Auction auction) {
         return ResponseWinningPriceDto.builder()
                 .winningPrice(auction.getWinningPrice())
                 .build();
     }
 
-    private static void validateAuctionCondition(RequestAuctionDto requestAuctionDto, Auction auction) {
+    private void validateAuctionCondition(RequestAuctionDto requestAuctionDto, Auction auction) {
         if (requestAuctionDto.getPoint() < auction.getOpeningPrice()) {
             throw new IllegalArgumentException("기본 입찰가보다 부족한 입찰 금액입니다");
         }

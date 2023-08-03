@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -121,11 +122,9 @@ class AuctionServiceTest {
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
 
-        try {
-            auctionServiceImpl.bid(1L, request, memberDetails);
-        } catch (IllegalArgumentException e) {
-            Assertions.assertThat(e.getMessage()).isEqualTo("현재 입찰가보다 부족한 입찰 금액입니다");
-        }
+        assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("현재 입찰가보다 부족한 입찰 금액입니다");
     }
 
     @Test
@@ -137,11 +136,9 @@ class AuctionServiceTest {
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
 
-        try {
-            auctionServiceImpl.bid(1L, request, memberDetails);
-        } catch (IllegalArgumentException e) {
-            Assertions.assertThat(e.getMessage()).isEqualTo("기본 입찰가보다 부족한 입찰 금액입니다");
-        }
+        assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("기본 입찰가보다 부족한 입찰 금액입니다");
     }
 
     @Test
@@ -153,10 +150,8 @@ class AuctionServiceTest {
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
 
-        try {
-            auctionServiceImpl.bid(1L, request, memberDetails);
-        } catch (IllegalStateException e) {
-            Assertions.assertThat(e.getMessage()).isEqualTo("경매가 종료되었습니다");
-        }
+        assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("경매가 종료되었습니다");
     }
 }
