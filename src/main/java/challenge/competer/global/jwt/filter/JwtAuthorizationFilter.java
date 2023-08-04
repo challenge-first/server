@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import challenge.competer.domain.member.entity.Member;
@@ -31,6 +32,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
 
+        if (CorsUtils.isPreFlightRequest(request)){
+            response.setHeader("Access-Control-Allow-Origin","*");
+            response.setHeader("Access-Control-Allow-Headers","*");
+            return;
+        }
+
         String tokenValue = jwtProvider.getToken(request);
         String token = jwtProvider.extractToken(tokenValue);
 
@@ -50,6 +57,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String servletPath = request.getRequestURI();
-        return servletPath.startsWith("/members/login") || servletPath.startsWith("/h2-console") || servletPath.startsWith("/products/main");
+        return servletPath.startsWith("/members/login") || servletPath.startsWith("/h2-console") || servletPath.startsWith("/products");
     }
 }
