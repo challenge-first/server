@@ -37,6 +37,7 @@ public class AuctionServiceImpl implements AuctionService {
                 () -> new IllegalArgumentException("이미지가 없습니다."));
 
         ResponseAuctionDto responseDto = ResponseAuctionDto.builder()
+                .id(auction.getId())
                 .name(product.getName())
                 .winningPrice(auction.getWinningPrice())
                 .openingPrice(auction.getOpeningPrice())

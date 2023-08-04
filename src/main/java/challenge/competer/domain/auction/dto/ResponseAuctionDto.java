@@ -7,8 +7,9 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ResponseAuctionDto {
+    private Long id;
     private String name;
     private String imageUrl;
     private Long openingPrice;
