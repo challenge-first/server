@@ -105,10 +105,34 @@ class ProductServiceTest {
                 .thenReturn(productList);
 
         //when
-        List<ResponseProductDto> findResponseProductDtos = productServiceImpl.getCategoryPageProducts(LAPTOP, LG);
+        List<ResponseProductDto> findResponseProductDtos = productServiceImpl.getCategoryPageProducts(LAPTOP.name(), LG.name());
 
         //then
         assertThat(findResponseProductDtos.size()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트 - 잘못된 메인 카테고리 이름")
+    void wrongMainCategoryNameGetCategoryPageProductsTest() {
+        //given
+        String wrongCategoryName = "LAPTOPPPPP";
+
+        //when, then
+        assertThatThrownBy(() -> productServiceImpl.getCategoryPageProducts(wrongCategoryName, LG.name()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 메인 카테고리는 없는 카테고리입니다.");
+    }
+
+    @Test
+    @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트 - 잘못된 서브 카테고리 이름")
+    void wrongSubCategoryNameGetCategoryPageProductsTest() {
+        //given
+        String wrongCategoryName = "LAPTOPPPPP";
+
+        //when, then
+        assertThatThrownBy(() -> productServiceImpl.getCategoryPageProducts(LAPTOP.name(), wrongCategoryName))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 서브 카테고리는 없는 카테고리입니다.");
     }
 
     @Test

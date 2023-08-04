@@ -37,8 +37,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ResponseProductDto> getCategoryPageProducts(MainCategory mainCategory, SubCategory subCategory) {
-        List<Product> findProducts = productRepository.findTop4ByCategory(mainCategory, subCategory);
+    public List<ResponseProductDto> getCategoryPageProducts(String mainCategory, String subCategory) {
+        MainCategory enumMainCategory = getEnumMainCategory(mainCategory);
+        SubCategory enumSubCategory = getEnumSubCategory(subCategory);
+        List<Product> findProducts = productRepository.findTop4ByCategory(enumMainCategory, enumSubCategory);
 
         return findProducts.stream()
                 .map(product -> {
@@ -48,6 +50,22 @@ public class ProductServiceImpl implements ProductService {
                     return createResponseProductDto(product, findImage);
                 })
                 .toList();
+    }
+
+    private MainCategory getEnumMainCategory(String mainCategory) {
+        try {
+            return MainCategory.valueOf(mainCategory.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("해당 메인 카테고리는 없는 카테고리입니다.");
+        }
+    }
+
+    private SubCategory getEnumSubCategory(String subCategory) {
+        try {
+            return SubCategory.valueOf(subCategory.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("해당 서브 카테고리는 없는 카테고리입니다.");
+        }
     }
 
     private ResponseProductDto createResponseProductDto(Product product, Image findImage) {
