@@ -65,7 +65,7 @@ class ProductControllerTest {
     @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트")
     void getCategoryProductsTest() throws Exception {
         //given
-        when(productService.getCategoryPageProducts(LAPTOP, LG))
+        when(productService.getCategoryPageProducts(LAPTOP.name(), LG.name()))
                 .thenReturn(responseProductDtos);
 
         //when, then

@@ -33,7 +33,7 @@ public class ProductController {
     }
 
     @GetMapping("/main/maincategory/{mainCategory}/subcategory/{subCategory}")
-    public ResponseEntity<ResponseDataDto> getCategoryProducts(@PathVariable MainCategory mainCategory, @PathVariable SubCategory subCategory) {
+    public ResponseEntity<ResponseDataDto> getCategoryProducts(@PathVariable String mainCategory, @PathVariable String subCategory) {
         List<ResponseProductDto> responseProductDtos = productService.getCategoryPageProducts(mainCategory, subCategory);
         ResponseDataDto responseDataDto = new ResponseDataDto(responseProductDtos);
 
