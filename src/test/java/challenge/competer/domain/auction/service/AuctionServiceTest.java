@@ -6,6 +6,8 @@ import challenge.competer.domain.auction.dto.ResponseWinningPriceDto;
 import challenge.competer.domain.auction.entity.Auction;
 import challenge.competer.domain.auction.repository.AuctionRepository;
 import challenge.competer.domain.image.entity.Image;
+import challenge.competer.domain.member.entity.Member;
+import challenge.competer.domain.member.role.Role;
 import challenge.competer.domain.product.entity.Product;
 import challenge.competer.domain.product.productenum.ProductState;
 import challenge.competer.domain.product.productenum.ProductType;
@@ -42,15 +44,14 @@ class AuctionServiceTest {
     @Mock
     private ImageRepository imageRepository;
 
-    @Mock
-    MemberDetails memberDetails;
-
     @InjectMocks
     private AuctionServiceImpl auctionServiceImpl;
 
     private Product product;
     private Image image;
     private Auction auction;
+    private Member member;
+    private MemberDetails memberDetails;
 
     @BeforeEach
     public void beforeEach() {
@@ -79,6 +80,17 @@ class AuctionServiceTest {
                 .closingTime(LocalDateTime.now().plusHours(1))
                 .winningPrice(6000L)
                 .build();
+
+        member = Member.builder()
+                .id(1L)
+                .point(20000L)
+                .username("userA")
+                .password("password")
+                .role(Role.MEMBER)
+                .deposit(0L)
+                .build();
+
+        memberDetails = new MemberDetails(member);
     }
 
     @Test
@@ -114,7 +126,7 @@ class AuctionServiceTest {
     }
 
     @Test
-    @DisplayName("현재 입찰가 실패 테스트")
+    @DisplayName("현재 입찰가 실패시 발생하는 예외 테스트")
     public void bidFailCausedByWinningPrice() {
 
         RequestAuctionDto request = new RequestAuctionDto(5000L, LocalDateTime.now());
@@ -128,7 +140,7 @@ class AuctionServiceTest {
     }
 
     @Test
-    @DisplayName("기본 입찰가 실패 테스트")
+    @DisplayName("기본 입찰가 실패시 발생하는 예외 테스트")
     public void bidFailCausedByOpeningPrice() {
 
         RequestAuctionDto request = new RequestAuctionDto(2000L, LocalDateTime.now());
@@ -142,7 +154,7 @@ class AuctionServiceTest {
     }
 
     @Test
-    @DisplayName("마감시간 초과 테스트")
+    @DisplayName("마감시간 초과시 발생하는 예외 테스트")
     public void bidFailCausedByClosingTime() {
 
         RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now().plusHours(6));
@@ -153,5 +165,19 @@ class AuctionServiceTest {
         assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("경매가 종료되었습니다");
+    }
+
+    @Test
+    @DisplayName("보유 포인트 부족시 발생하는 예외 테스트")
+    public void bidFailCausedByPoint() {
+
+        RequestAuctionDto request = new RequestAuctionDto(30000L, LocalDateTime.now());
+
+        when(auctionRepository.findById(any()))
+                .thenReturn(Optional.of(auction));
+
+        assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("포인트가 부족합니다");
     }
 }

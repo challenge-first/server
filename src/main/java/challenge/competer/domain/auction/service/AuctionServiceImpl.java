@@ -55,7 +55,7 @@ public class AuctionServiceImpl implements AuctionService {
 
         Auction findAuction = auctionRepository.findById(auctionId).orElseThrow(() -> new IllegalArgumentException("상품이 없습니다"));
 
-        validateAuctionCondition(requestAuctionDto, findAuction);
+        validateAuctionCondition(requestAuctionDto, findAuction, memberDetails);
         findAuction.update(requestAuctionDto.getPoint());
 
         return createResponseWinningPriceDto(findAuction);
@@ -67,7 +67,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .build();
     }
 
-    private void validateAuctionCondition(RequestAuctionDto requestAuctionDto, Auction auction) {
+    private void validateAuctionCondition(RequestAuctionDto requestAuctionDto, Auction auction, MemberDetails memberDetails) {
         if (requestAuctionDto.getPoint() < auction.getOpeningPrice()) {
             throw new IllegalArgumentException("기본 입찰가보다 부족한 입찰 금액입니다");
         }
@@ -79,7 +79,9 @@ public class AuctionServiceImpl implements AuctionService {
         if (requestAuctionDto.getTime().isAfter(auction.getClosingTime())) {
             throw new IllegalStateException("경매가 종료되었습니다");
         }
+
+        if (memberDetails.getPoint() < requestAuctionDto.getPoint()) {
+            throw new IllegalStateException("포인트가 부족합니다");
+        }
     }
-
-
 }
