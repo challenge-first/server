@@ -11,7 +11,7 @@ public interface ProductService {
 
     List<ResponseProductDto> getMainPageProducts();
 
-    List<ResponseProductDto> getCategoryPageProducts(String mainCategory, String subCategory);
+    List<ResponseProductDto> getCategoryProducts(String mainCategory, List<String> subCategory);
 
     ResponseDetailProductDto getDetailProduct(Long productId);
 
