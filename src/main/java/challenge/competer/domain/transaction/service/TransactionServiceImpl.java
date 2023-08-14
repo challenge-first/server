@@ -43,7 +43,7 @@ public class TransactionServiceImpl implements TransactionService {
             hasStock(product);
 
             Transaction transaction = saveTransaction(member, product, COMPLETED, requestDto.getPrice());
-            transaction.getMember().subtractPoint(requestDto.getPrice());
+            transaction.getMember().payPoint(requestDto.getPrice());
             transaction.getProduct().decreaseStockCount();
 
             return new ResponseMessageDto("결제 완료", HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase());
