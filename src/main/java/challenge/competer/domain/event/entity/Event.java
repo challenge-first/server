@@ -48,6 +48,10 @@ public class Event {
     @Enumerated(STRING)
     private EventStatus eventStatus;
 
+    @Column(nullable = false)
+    private Double discountRate;
 
-
+    public void updateCurrentMember() {
+        this.currentMemberCount++;
+    }
 }
