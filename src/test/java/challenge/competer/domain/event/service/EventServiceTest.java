@@ -1,7 +1,6 @@
 package challenge.competer.domain.event.service;
 
 import challenge.competer.domain.event.dto.ResponseEventDto;
-import challenge.competer.domain.event.entity.Coupon;
 import challenge.competer.domain.event.entity.Event;
 import challenge.competer.domain.event.eventstatus.EventStatus;
 import challenge.competer.domain.event.repository.CouponRepository;
