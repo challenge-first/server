@@ -1,13 +1,19 @@
 package challenge.competer.domain.event.service;
 
 import challenge.competer.domain.event.dto.ResponseEventDto;
+import challenge.competer.domain.event.entity.Coupon;
 import challenge.competer.domain.event.entity.Event;
+import challenge.competer.domain.event.eventstatus.EventStatus;
+import challenge.competer.domain.event.repository.CouponRepository;
 import challenge.competer.domain.event.repository.EventRepository;
 import challenge.competer.domain.image.entity.Image;
+import challenge.competer.domain.member.entity.Member;
 import challenge.competer.domain.product.entity.Product;
 import challenge.competer.domain.product.repository.ImageRepository;
 import challenge.competer.domain.product.repository.ProductRepository;
+import challenge.competer.global.auth.MemberDetails;
 import challenge.competer.global.response.ResponseDataDto;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,6 +47,9 @@ class EventServiceTest {
 
     @Mock
     ImageRepository imageRepository;
+
+    @Mock
+    private CouponRepository couponRepository;
 
     @InjectMocks
     EventServiceImpl eventService;
@@ -83,4 +92,85 @@ class EventServiceTest {
                 .hasMessage("현재 진행중인 이벤트가 없습니다.");
     }
 
+    @DisplayName("쿠폰 생성에 성공한다.")
+    @Test
+    public void createCoupon_O() throws Exception {
+        //given
+        Event event = Event.builder()
+                .id(1L)
+                .discountRate(30.0)
+                .currentMemberCount(1L)
+                .maxMemberCount(10L)
+                .build();
+
+        when(eventRepository.findById(event.getId()))
+                .thenReturn(Optional.of(event));
+
+        Member member = Member.builder()
+                .id(1L)
+                .build();
+        MemberDetails memberDetails = new MemberDetails(member);
+
+        when(couponRepository.countByEventId(event.getId()))
+                .thenReturn(Optional.of(1L));
+
+        //when
+        eventService.createCoupon(1L, memberDetails);
+
+        //then
+        Optional<Long> savedCount = couponRepository.countByEventId(event.getId());
+        verify(couponRepository,times(1)).save(any());
+        Assertions.assertThat(savedCount.get()).isEqualTo(1L);
+    }
+
+    @DisplayName("최대 발급 가능한 쿠폰 개수보다 많은 쿠폰이 생성될 때 예외가 발생한다.")
+    @Test
+    public void couponCreate_X1() {
+        //given
+        Event event = Event.builder()
+                .id(1L)
+                .eventStatus(EventStatus.OPEN)
+                .maxMemberCount(2L)
+                .build();
+        Member member = Member
+                .builder()
+                .id(1L)
+                .build();
+        MemberDetails memberDetails = new MemberDetails(member);
+        when(eventRepository.findById(any()))
+                .thenReturn(Optional.of(event));
+        when(couponRepository.countByEventId(any()))
+                .thenReturn(Optional.of(2L));
+
+        //when
+        //then
+        assertThatThrownBy(() -> eventService.createCoupon(event.getId(), memberDetails))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("발급된 쿠폰의 개수가 현재 참여 인원수와 같지 않다면 예외가 발생한다.")
+    @Test
+    public void couponCreate_X2() {
+        //given
+        Event event = Event.builder()
+                .id(1L)
+                .eventStatus(EventStatus.OPEN)
+                .currentMemberCount(3L)
+                .maxMemberCount(5L)
+                .build();
+        Member member = Member
+                .builder()
+                .id(1L)
+                .build();
+        MemberDetails memberDetails = new MemberDetails(member);
+        when(eventRepository.findById(any()))
+                .thenReturn(Optional.of(event));
+        when(couponRepository.countByEventId(any()))
+                .thenReturn(Optional.of(2L));
+
+        //when
+        //then
+        assertThatThrownBy(() -> eventService.createCoupon(event.getId(), memberDetails))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
