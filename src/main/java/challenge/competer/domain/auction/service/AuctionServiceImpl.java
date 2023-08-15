@@ -13,10 +13,12 @@ import challenge.competer.domain.product.repository.ImageRepository;
 import challenge.competer.domain.product.repository.ProductRepository;
 import challenge.competer.global.auth.MemberDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -49,9 +51,6 @@ public class AuctionServiceImpl implements AuctionService {
                 .closingTime(auction.getClosingTime())
                 .build();
 
-        //if 문 걸고 경매 종료시 member balance 차감 로직
-        //경매 종료 후 사용자들의 예치금이 0으로 초기화되고 낙찰 실패자들의 예치금이 다시 포인트로 돌아가는 메서드는 어디에서 실행?
-
         return responseDto;
     }
 
@@ -63,15 +62,23 @@ public class AuctionServiceImpl implements AuctionService {
         Member findMember = memberRepository.findById(memberDetails.getId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
 
         validateAuctionCondition(requestAuctionDto, findAuction, findMember);
-        findAuction.update(requestAuctionDto.getPoint());
+        initMemberDeposit(requestAuctionDto, findAuction, findMember);
+
+        findAuction.update(requestAuctionDto.getPoint(), findMember.getId());
 
         return createResponseWinningPriceDto(findAuction);
     }
 
-    private ResponseWinningPriceDto createResponseWinningPriceDto(Auction auction) {
-        return ResponseWinningPriceDto.builder()
-                .winningPrice(auction.getWinningPrice())
-                .build();
+    @Override
+    @Scheduled(cron = "0 0 17 * * *")
+    @Transactional(readOnly = true)
+    public void checkAndCloseAuctions() {
+        Auction auction = auctionRepository.findByClosingTimeBetween(
+                LocalDateTime.now().withHour(15),
+                LocalDateTime.now().withHour(16).withMinute(59)
+        );
+
+        closeAuction(auction);
     }
 
     private void validateAuctionCondition(RequestAuctionDto requestAuctionDto, Auction auction, Member member) {
@@ -90,5 +97,26 @@ public class AuctionServiceImpl implements AuctionService {
         if (member.getPoint() < requestAuctionDto.getPoint()) {
             throw new IllegalStateException("포인트가 부족합니다");
         }
+    }
+
+    private void initMemberDeposit(RequestAuctionDto requestAuctionDto, Auction findAuction, Member findMember) {
+        if (findAuction.getMemberId() != null) {
+            Member existedmember = memberRepository.findById(findAuction.getMemberId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
+            existedmember.resetDeposit();
+        }
+
+        findMember.setDeposit(requestAuctionDto.getPoint());
+    }
+
+    private ResponseWinningPriceDto createResponseWinningPriceDto(Auction auction) {
+        return ResponseWinningPriceDto.builder()
+                .winningPrice(auction.getWinningPrice())
+                .build();
+    }
+
+    private void closeAuction(Auction auction) {
+
+        Member winningAuctionMember = memberRepository.findById(auction.getMemberId()).orElseThrow();
+        winningAuctionMember.subtractPointsOnBidSuccess();
     }
 }

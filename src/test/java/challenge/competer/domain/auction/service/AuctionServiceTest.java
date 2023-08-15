@@ -28,10 +28,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 
 @ExtendWith(MockitoExtension.class)
 class AuctionServiceTest {
@@ -54,8 +55,10 @@ class AuctionServiceTest {
     private Product product;
     private Image image;
     private Auction auction;
-    private Member member;
-    private MemberDetails memberDetails;
+    private Member member1;
+    private Member member2;
+    private MemberDetails memberDetails1;
+    private MemberDetails memberDetails2;
 
     @BeforeEach
     public void beforeEach() {
@@ -80,12 +83,12 @@ class AuctionServiceTest {
                 .memberId(1L)
                 .productId(product.getId())
                 .openingPrice(3000L)
-                .openingTime(LocalDateTime.now().minusMinutes(1))
-                .closingTime(LocalDateTime.now().plusHours(1))
+                .openingTime(LocalDateTime.now().withHour(15))
+                .closingTime(LocalDateTime.now().withHour(16).withMinute(59))
                 .winningPrice(6000L)
                 .build();
 
-        member = Member.builder()
+        member1 = Member.builder()
                 .id(1L)
                 .point(20000L)
                 .username("userA")
@@ -94,7 +97,17 @@ class AuctionServiceTest {
                 .deposit(0L)
                 .build();
 
-        memberDetails = new MemberDetails(member);
+        member2 = Member.builder()
+                .id(2L)
+                .point(30000L)
+                .username("userB")
+                .password("password")
+                .role(Role.MEMBER)
+                .deposit(0L)
+                .build();
+
+        memberDetails1 = new MemberDetails(member1);
+        memberDetails2 = new MemberDetails(member2);
     }
 
     @Test
@@ -120,14 +133,14 @@ class AuctionServiceTest {
     public void bidSuccess() {
 
         when(memberRepository.findById(any()))
-                .thenReturn(Optional.of(member));
+                .thenReturn(Optional.of(member1));
 
-        RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now());
+        RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now().withHour(15));
 
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
 
-        ResponseWinningPriceDto response = auctionServiceImpl.bid(1L, request, memberDetails);
+        ResponseWinningPriceDto response = auctionServiceImpl.bid(1L, request, memberDetails1);
 
         Assertions.assertThat(response.getWinningPrice()).isEqualTo(10000L);
     }
@@ -137,14 +150,14 @@ class AuctionServiceTest {
     public void bidFailCausedByWinningPrice() {
 
         when(memberRepository.findById(any()))
-                .thenReturn(Optional.of(member));
+                .thenReturn(Optional.of(member1));
 
-        RequestAuctionDto request = new RequestAuctionDto(5000L, LocalDateTime.now());
+        RequestAuctionDto request = new RequestAuctionDto(5000L, LocalDateTime.now().withHour(16));
 
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
 
-        assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails))
+        assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("현재 입찰가보다 부족한 입찰 금액입니다");
     }
@@ -154,14 +167,14 @@ class AuctionServiceTest {
     public void bidFailCausedByOpeningPrice() {
 
         when(memberRepository.findById(any()))
-                .thenReturn(Optional.of(member));
+                .thenReturn(Optional.of(member1));
 
-        RequestAuctionDto request = new RequestAuctionDto(2000L, LocalDateTime.now());
+        RequestAuctionDto request = new RequestAuctionDto(2000L, LocalDateTime.now().withHour(16));
 
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
 
-        assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails))
+        assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("기본 입찰가보다 부족한 입찰 금액입니다");
     }
@@ -171,14 +184,14 @@ class AuctionServiceTest {
     public void bidFailCausedByClosingTime() {
 
         when(memberRepository.findById(any()))
-                .thenReturn(Optional.of(member));
+                .thenReturn(Optional.of(member1));
 
-        RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now().plusHours(6));
+        RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now().withHour(17));
 
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
 
-        assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails))
+        assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails1))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("경매가 종료되었습니다");
     }
@@ -188,15 +201,36 @@ class AuctionServiceTest {
     public void bidFailCausedByPoint() {
 
         when(memberRepository.findById(any()))
-                .thenReturn(Optional.of(member));
+                .thenReturn(Optional.of(member1));
 
-        RequestAuctionDto request = new RequestAuctionDto(30000L, LocalDateTime.now());
+        RequestAuctionDto request = new RequestAuctionDto(30000L, LocalDateTime.now().withHour(16));
 
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
 
-        assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails))
+        assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails1))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("포인트가 부족합니다");
+    }
+
+    @Test
+    @DisplayName("입찰 경쟁 및 예치금 초기화 테스트")
+    public void bidCompetitionAndInitDeposit() {
+
+
+    }
+
+    @Test
+    @DisplayName("경매 종료 후 회원 포인트 차감 테스트")
+    public void winAuction() {
+
+        when(memberRepository.findById(any()))
+                .thenReturn(Optional.of(member1));
+        when(auctionRepository.findByClosingTimeBetween(any(), any()))
+                .thenReturn(auction);
+
+        auctionServiceImpl.checkAndCloseAuctions();
+
+        Assertions.assertThat(member1.getPoint()).isEqualTo(14000L);
     }
 }

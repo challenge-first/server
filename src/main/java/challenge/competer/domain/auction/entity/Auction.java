@@ -40,7 +40,13 @@ public class Auction {
     @Column(nullable = false)
     private LocalDateTime closingTime;
 
-    public void update (Long winningPrice) {
+    public void update (Long winningPrice, Long memberId) {
+
         this.winningPrice = winningPrice;
+        this.memberId = memberId;
+    }
+
+    public boolean hasEnded() {
+        return LocalDateTime.now().isAfter(closingTime);
     }
 }

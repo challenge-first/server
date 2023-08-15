@@ -75,7 +75,7 @@ public class Member {
         return point - deposit;
     }
 
-    private void resetDeposit() {
+    public void resetDeposit() {
         this.deposit = 0L;
     }
 }
