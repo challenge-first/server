@@ -7,6 +7,7 @@ import challenge.competer.domain.auction.entity.Auction;
 import challenge.competer.domain.auction.repository.AuctionRepository;
 import challenge.competer.domain.image.entity.Image;
 import challenge.competer.domain.member.entity.Member;
+import challenge.competer.domain.member.repository.MemberRepository;
 import challenge.competer.domain.member.role.Role;
 import challenge.competer.domain.product.entity.Product;
 import challenge.competer.domain.product.productenum.ProductState;
@@ -43,6 +44,9 @@ class AuctionServiceTest {
 
     @Mock
     private ImageRepository imageRepository;
+
+    @Mock
+    private MemberRepository memberRepository;
 
     @InjectMocks
     private AuctionServiceImpl auctionServiceImpl;
@@ -115,6 +119,9 @@ class AuctionServiceTest {
     @DisplayName("입찰 성공 테스트")
     public void bidSuccess() {
 
+        when(memberRepository.findById(any()))
+                .thenReturn(Optional.of(member));
+
         RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now());
 
         when(auctionRepository.findById(any()))
@@ -128,6 +135,9 @@ class AuctionServiceTest {
     @Test
     @DisplayName("현재 입찰가 실패시 발생하는 예외 테스트")
     public void bidFailCausedByWinningPrice() {
+
+        when(memberRepository.findById(any()))
+                .thenReturn(Optional.of(member));
 
         RequestAuctionDto request = new RequestAuctionDto(5000L, LocalDateTime.now());
 
@@ -143,6 +153,9 @@ class AuctionServiceTest {
     @DisplayName("기본 입찰가 실패시 발생하는 예외 테스트")
     public void bidFailCausedByOpeningPrice() {
 
+        when(memberRepository.findById(any()))
+                .thenReturn(Optional.of(member));
+
         RequestAuctionDto request = new RequestAuctionDto(2000L, LocalDateTime.now());
 
         when(auctionRepository.findById(any()))
@@ -157,6 +170,9 @@ class AuctionServiceTest {
     @DisplayName("마감시간 초과시 발생하는 예외 테스트")
     public void bidFailCausedByClosingTime() {
 
+        when(memberRepository.findById(any()))
+                .thenReturn(Optional.of(member));
+
         RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now().plusHours(6));
 
         when(auctionRepository.findById(any()))
@@ -170,6 +186,9 @@ class AuctionServiceTest {
     @Test
     @DisplayName("보유 포인트 부족시 발생하는 예외 테스트")
     public void bidFailCausedByPoint() {
+
+        when(memberRepository.findById(any()))
+                .thenReturn(Optional.of(member));
 
         RequestAuctionDto request = new RequestAuctionDto(30000L, LocalDateTime.now());
 
