@@ -28,10 +28,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -80,7 +80,6 @@ class AuctionServiceTest {
 
         auction = Auction.builder()
                 .id(1L)
-                .memberId(1L)
                 .productId(product.getId())
                 .openingPrice(3000L)
                 .openingTime(LocalDateTime.now().withHour(15))
@@ -129,20 +128,39 @@ class AuctionServiceTest {
     }
 
     @Test
-    @DisplayName("입찰 성공 테스트")
-    public void bidSuccess() {
+    @DisplayName("입찰 성공 테스트1")
+    public void bidSuccess1() {
 
         when(memberRepository.findById(any()))
                 .thenReturn(Optional.of(member1));
 
-        RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now().withHour(15));
+        RequestAuctionDto request = new RequestAuctionDto(12000L, LocalDateTime.now().withHour(15));
 
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
 
         ResponseWinningPriceDto response = auctionServiceImpl.bid(1L, request, memberDetails1);
 
-        Assertions.assertThat(response.getWinningPrice()).isEqualTo(10000L);
+        Assertions.assertThat(response.getWinningPrice()).isEqualTo(12000L);
+    }
+
+    @Test
+    @DisplayName("입찰 성공 테스트2")
+    public void bidSuccess2() {
+
+        when(memberRepository.findById(any()))
+                .thenReturn(Optional.of(member2));
+        when(memberRepository.findById(1L))
+                .thenReturn(Optional.of(member1));
+
+        RequestAuctionDto request = new RequestAuctionDto(20000L, LocalDateTime.now().withHour(15));
+
+        when(auctionRepository.findById(any()))
+                .thenReturn(Optional.of(auction));
+
+        ResponseWinningPriceDto response = auctionServiceImpl.bid(1L, request, memberDetails2);
+
+        Assertions.assertThat(response.getWinningPrice()).isEqualTo(20000L);
     }
 
     @Test
@@ -217,12 +235,19 @@ class AuctionServiceTest {
     @DisplayName("입찰 경쟁 및 예치금 초기화 테스트")
     public void bidCompetitionAndInitDeposit() {
 
+        bidSuccess1();
+        bidSuccess2();
 
+        Assertions.assertThat(member1.getDeposit()).isEqualTo(0L);
+        Assertions.assertThat(member2.getDeposit()).isEqualTo(20000L);
+        Assertions.assertThat(auction.getMemberId()).isEqualTo(2L);
     }
 
     @Test
     @DisplayName("경매 종료 후 회원 포인트 차감 테스트")
     public void winAuction() {
+
+        bidSuccess1();
 
         when(memberRepository.findById(any()))
                 .thenReturn(Optional.of(member1));
@@ -231,6 +256,6 @@ class AuctionServiceTest {
 
         auctionServiceImpl.checkAndCloseAuctions();
 
-        Assertions.assertThat(member1.getPoint()).isEqualTo(14000L);
+        Assertions.assertThat(member1.getPoint()).isEqualTo(8000L);
     }
 }

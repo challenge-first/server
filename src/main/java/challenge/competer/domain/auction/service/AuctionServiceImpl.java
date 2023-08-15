@@ -62,7 +62,7 @@ public class AuctionServiceImpl implements AuctionService {
         Member findMember = memberRepository.findById(memberDetails.getId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
 
         validateAuctionCondition(requestAuctionDto, findAuction, findMember);
-        initMemberDeposit(requestAuctionDto, findAuction, findMember);
+        initMemberDeposit(requestAuctionDto, findAuction.getMemberId(), findMember);
 
         findAuction.update(requestAuctionDto.getPoint(), findMember.getId());
 
@@ -99,9 +99,9 @@ public class AuctionServiceImpl implements AuctionService {
         }
     }
 
-    private void initMemberDeposit(RequestAuctionDto requestAuctionDto, Auction findAuction, Member findMember) {
-        if (findAuction.getMemberId() != null) {
-            Member existedmember = memberRepository.findById(findAuction.getMemberId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
+    private void initMemberDeposit(RequestAuctionDto requestAuctionDto, Long memberId, Member findMember) {
+        if (memberId != null) {
+            Member existedmember = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
             existedmember.resetDeposit();
         }
 
