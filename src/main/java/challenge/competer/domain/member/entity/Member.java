@@ -39,11 +39,43 @@ public class Member {
     @Column(nullable = false)
     private Long deposit;
 
-    public void addPoint(Long point) {
+    public void rechargePoint(Long point) {
         this.point += point;
     }
 
-    public void subtractPoint(int price) {
-        this.point -= price;
+    public void payPoint(int price) {
+        Long availablePoint = getAvailablePoint();
+        Long balance = availablePoint - price;
+        if (balance < 0) {
+            throw new IllegalArgumentException();
+        }
+        this.point = balance;
+    }
+
+    public void subtractPointsOnBidSuccess() {
+        Long balance = this.point - this.deposit;
+        if (balance < 0) {
+            throw new IllegalArgumentException();
+        }
+        this.point = balance;
+        resetDeposit();
+    }
+
+    public void setDeposit(Long bid) {
+        if (point < bid) {
+            throw new IllegalArgumentException();
+        }
+        this.deposit = bid;
+    }
+
+    public Long getAvailablePoint() {
+        if (point - deposit < 0) {
+            throw new IllegalArgumentException();
+        }
+        return point - deposit;
+    }
+
+    private void resetDeposit() {
+        this.deposit = 0L;
     }
 }

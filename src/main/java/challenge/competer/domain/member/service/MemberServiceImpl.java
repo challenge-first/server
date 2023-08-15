@@ -44,7 +44,7 @@ public class MemberServiceImpl implements MemberService {
     public ResponseMessageDto addPoint(RequestMemberPointDto requestDto, MemberDetails memberDetails) {
         Member member = memberRepository.findById(memberDetails.getId())
             .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
-        member.addPoint(requestDto.getPoint());
+        member.rechargePoint(requestDto.getPoint());
     return new ResponseMessageDto("충전 완료", HttpStatus.OK.value(), HttpStatus.OK.toString());
     }
 
