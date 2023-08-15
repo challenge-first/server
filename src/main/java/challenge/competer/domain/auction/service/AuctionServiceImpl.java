@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -73,10 +74,7 @@ public class AuctionServiceImpl implements AuctionService {
     @Scheduled(cron = "0 0 17 * * *")
     @Transactional(readOnly = true)
     public void checkAndCloseAuctions() {
-        Auction auction = auctionRepository.findByClosingTimeBetween(
-                LocalDateTime.now().withHour(15),
-                LocalDateTime.now().withHour(16).withMinute(59)
-        );
+        Auction auction = auctionRepository.findByClosingTimeBetween(LocalDateTime.now().withHour(15), LocalDateTime.now().withHour(16).withMinute(59)).orElseThrow();
 
         closeAuction(auction);
     }
@@ -99,6 +97,12 @@ public class AuctionServiceImpl implements AuctionService {
         }
     }
 
+    private ResponseWinningPriceDto createResponseWinningPriceDto(Auction auction) {
+        return ResponseWinningPriceDto.builder()
+                .winningPrice(auction.getWinningPrice())
+                .build();
+    }
+
     private void initMemberDeposit(RequestAuctionDto requestAuctionDto, Long memberId, Member findMember) {
         if (memberId != null) {
             Member existedmember = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
@@ -108,13 +112,7 @@ public class AuctionServiceImpl implements AuctionService {
         findMember.setDeposit(requestAuctionDto.getPoint());
     }
 
-    private ResponseWinningPriceDto createResponseWinningPriceDto(Auction auction) {
-        return ResponseWinningPriceDto.builder()
-                .winningPrice(auction.getWinningPrice())
-                .build();
-    }
-
-    private void closeAuction(Auction auction) {
+    public void closeAuction(Auction auction) {
 
         Member winningAuctionMember = memberRepository.findById(auction.getMemberId()).orElseThrow();
         winningAuctionMember.subtractPointsOnBidSuccess();

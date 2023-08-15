@@ -24,6 +24,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.scheduling.config.CronTask;
+import org.springframework.scheduling.config.ScheduledTaskHolder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -32,7 +37,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 class AuctionServiceTest {
@@ -133,11 +137,10 @@ class AuctionServiceTest {
 
         when(memberRepository.findById(any()))
                 .thenReturn(Optional.of(member1));
-
-        RequestAuctionDto request = new RequestAuctionDto(12000L, LocalDateTime.now().withHour(15));
-
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
+
+        RequestAuctionDto request = new RequestAuctionDto(12000L, LocalDateTime.now().withHour(15));
 
         ResponseWinningPriceDto response = auctionServiceImpl.bid(1L, request, memberDetails1);
 
@@ -150,13 +153,10 @@ class AuctionServiceTest {
 
         when(memberRepository.findById(any()))
                 .thenReturn(Optional.of(member2));
-        when(memberRepository.findById(1L))
-                .thenReturn(Optional.of(member1));
-
-        RequestAuctionDto request = new RequestAuctionDto(20000L, LocalDateTime.now().withHour(15));
-
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
+
+        RequestAuctionDto request = new RequestAuctionDto(20000L, LocalDateTime.now().withHour(15));
 
         ResponseWinningPriceDto response = auctionServiceImpl.bid(1L, request, memberDetails2);
 
@@ -169,11 +169,10 @@ class AuctionServiceTest {
 
         when(memberRepository.findById(any()))
                 .thenReturn(Optional.of(member1));
-
-        RequestAuctionDto request = new RequestAuctionDto(5000L, LocalDateTime.now().withHour(16));
-
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
+
+        RequestAuctionDto request = new RequestAuctionDto(5000L, LocalDateTime.now().withHour(16));
 
         assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails1))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -186,11 +185,10 @@ class AuctionServiceTest {
 
         when(memberRepository.findById(any()))
                 .thenReturn(Optional.of(member1));
-
-        RequestAuctionDto request = new RequestAuctionDto(2000L, LocalDateTime.now().withHour(16));
-
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
+
+        RequestAuctionDto request = new RequestAuctionDto(2000L, LocalDateTime.now().withHour(16));
 
         assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails1))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -203,11 +201,10 @@ class AuctionServiceTest {
 
         when(memberRepository.findById(any()))
                 .thenReturn(Optional.of(member1));
-
-        RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now().withHour(17));
-
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
+
+        RequestAuctionDto request = new RequestAuctionDto(10000L, LocalDateTime.now().withHour(17));
 
         assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails1))
                 .isInstanceOf(IllegalStateException.class)
@@ -220,11 +217,10 @@ class AuctionServiceTest {
 
         when(memberRepository.findById(any()))
                 .thenReturn(Optional.of(member1));
-
-        RequestAuctionDto request = new RequestAuctionDto(30000L, LocalDateTime.now().withHour(16));
-
         when(auctionRepository.findById(any()))
                 .thenReturn(Optional.of(auction));
+
+        RequestAuctionDto request = new RequestAuctionDto(30000L, LocalDateTime.now().withHour(16));
 
         assertThatThrownBy(() -> auctionServiceImpl.bid(1L, request, memberDetails1))
                 .isInstanceOf(IllegalStateException.class)
@@ -235,8 +231,18 @@ class AuctionServiceTest {
     @DisplayName("입찰 경쟁 및 예치금 초기화 테스트")
     public void bidCompetitionAndInitDeposit() {
 
-        bidSuccess1();
-        bidSuccess2();
+        when(memberRepository.findById(1L))
+                .thenReturn(Optional.of(member1));
+        when(memberRepository.findById(2L))
+                .thenReturn(Optional.of(member2));
+        when(auctionRepository.findById(any()))
+                .thenReturn(Optional.of(auction));
+
+        RequestAuctionDto request1 = new RequestAuctionDto(12000L, LocalDateTime.now().withHour(15));
+        RequestAuctionDto request2 = new RequestAuctionDto(20000L, LocalDateTime.now().withHour(15));
+
+        auctionServiceImpl.bid(1L, request1, memberDetails1);
+        auctionServiceImpl.bid(1L, request2, memberDetails2);
 
         Assertions.assertThat(member1.getDeposit()).isEqualTo(0L);
         Assertions.assertThat(member2.getDeposit()).isEqualTo(20000L);
@@ -247,15 +253,25 @@ class AuctionServiceTest {
     @DisplayName("경매 종료 후 회원 포인트 차감 테스트")
     public void winAuction() {
 
-        bidSuccess1();
-
-        when(memberRepository.findById(any()))
+        when(memberRepository.findById(1L))
                 .thenReturn(Optional.of(member1));
+        when(memberRepository.findById(2L))
+                .thenReturn(Optional.of(member2));
+        when(auctionRepository.findById(any()))
+                .thenReturn(Optional.of(auction));
         when(auctionRepository.findByClosingTimeBetween(any(), any()))
-                .thenReturn(auction);
+                .thenReturn(Optional.of(auction));
+
+        RequestAuctionDto request1 = new RequestAuctionDto(12000L, LocalDateTime.now().withHour(15));
+        RequestAuctionDto request2 = new RequestAuctionDto(20000L, LocalDateTime.now().withHour(15));
+
+        auctionServiceImpl.bid(1L, request1, memberDetails1);
+        auctionServiceImpl.bid(1L, request2, memberDetails2);
 
         auctionServiceImpl.checkAndCloseAuctions();
 
-        Assertions.assertThat(member1.getPoint()).isEqualTo(8000L);
+        Assertions.assertThat(auction.getMemberId()).isEqualTo(2L);
+        Assertions.assertThat(member1.getPoint()).isEqualTo(20000L);
+        Assertions.assertThat(member2.getPoint()).isEqualTo(10000L);
     }
 }

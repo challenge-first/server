@@ -13,5 +13,5 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     @Query("select a from Auction a where a.closingTime > :current_time and a.openingTime <= :current_time order by a.id desc limit 1")
     Optional<Auction> findByCurrentTime(@Param("current_time") LocalDateTime currentTime );
 
-    Auction findByClosingTimeBetween(LocalDateTime localDateTime, LocalDateTime localDateTime1);
+    Optional<Auction> findByClosingTimeBetween(LocalDateTime localDateTime, LocalDateTime localDateTime1);
 }
