@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -26,22 +27,32 @@ public class ProductServiceImpl implements ProductService {
     public List<ResponseProductDto> getMainPageProducts() {
         List<Product> findProducts = productRepository.findTop4ByOrderByIdDesc();
 
-        return findProducts.stream()
-                .map(product -> {
-                    Image findImage = imageRepository.findFirstByProductId(product.getId())
-                            .orElseThrow(() -> new IllegalArgumentException("이미지가 없습니다."));
-
-                    return createResponseProductDto(product, findImage);
-                })
-                .toList();
+        return generateResponseProductDtos(findProducts);
     }
 
     @Override
-    public List<ResponseProductDto> getCategoryPageProducts(String mainCategory, String subCategory) {
+    public List<ResponseProductDto> getCategoryProducts(String mainCategory, List<String> subCategory) {
         MainCategory enumMainCategory = getEnumMainCategory(mainCategory);
-        SubCategory enumSubCategory = getEnumSubCategory(subCategory);
-        List<Product> findProducts = productRepository.findTop4ByCategory(enumMainCategory, enumSubCategory);
+        Optional<List<String>> optionalSubCategory = Optional.ofNullable(subCategory);
+        List<ResponseProductDto> resultResponseProductDtos = new ArrayList<>();
 
+        if (optionalSubCategory.isEmpty()) {
+            List<Product> findProducts = productRepository.findTop4ByMainCategory(enumMainCategory);
+
+            return generateResponseProductDtos(findProducts);
+        }
+
+        subCategory.forEach(category -> {
+            SubCategory enumSubCategory = getEnumSubCategory(category);
+            List<Product> findProducts = productRepository.findTop4ByCategory(enumMainCategory, enumSubCategory);
+            List<ResponseProductDto> responseProductDtos = generateResponseProductDtos(findProducts);
+            resultResponseProductDtos.addAll(responseProductDtos);
+        });
+
+        return resultResponseProductDtos;
+    }
+
+    private List<ResponseProductDto> generateResponseProductDtos(List<Product> findProducts) {
         return findProducts.stream()
                 .map(product -> {
                     Image findImage = imageRepository.findFirstByProductId(product.getId())

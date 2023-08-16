@@ -15,4 +15,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("select p from Product p where p.mainCategory = :mainCategory and p.subCategory = :subCategory order by p.id desc limit 4")
     List<Product> findTop4ByCategory(@Param("mainCategory") MainCategory mainCategory, @Param("subCategory") SubCategory subCategory);
+
+    @Query("select p from Product p where p.mainCategory = :mainCategory order by p.id desc limit 4")
+    List<Product> findTop4ByMainCategory(@Param("mainCategory") MainCategory mainCategory);
 }
