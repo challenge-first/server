@@ -3,6 +3,7 @@ package challenge.competer.domain.event.service;
 import challenge.competer.domain.event.dto.ResponseEventDto;
 import challenge.competer.domain.event.entity.Coupon;
 import challenge.competer.domain.event.entity.Event;
+import challenge.competer.domain.event.eventstatus.EventStatus;
 import challenge.competer.domain.event.repository.CouponRepository;
 import challenge.competer.domain.event.repository.EventRepository;
 import challenge.competer.domain.image.entity.Image;
@@ -13,8 +14,10 @@ import challenge.competer.global.auth.MemberDetails;
 import challenge.competer.global.response.ResponseDataDto;
 import challenge.competer.global.response.ResponseMessageDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ import static challenge.competer.domain.event.eventstatus.EventStatus.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "EventService")
 public class EventServiceImpl implements EventService {
 
     private final CouponRepository couponRepository;
@@ -54,9 +58,8 @@ public class EventServiceImpl implements EventService {
         Long couponCount = couponRepository.countByEventId(eventId).orElseThrow();
         Event currentEvent = eventRepository.findById(eventId).orElseThrow();
 
-        if (couponCount >= currentEvent.getMaxMemberCount() || couponCount != currentEvent.getCurrentMemberCount()) {
-            throw new IllegalArgumentException("Can't create Coupon");
-        }
+
+        validateCreateCoupon(currentEvent, couponCount);
 
         Coupon coupon = Coupon.builder()
                 .eventId(currentEvent.getId())
@@ -67,6 +70,10 @@ public class EventServiceImpl implements EventService {
         couponRepository.save(coupon);
         currentEvent.updateCurrentMember();
 
+        if (currentEvent.getMaxMemberCount() == currentEvent.getCurrentMemberCount()) {
+            currentEvent.closeEventBeforeClosingTime(LocalDateTime.now());
+        }
+
         ResponseMessageDto responseMessageDto = new ResponseMessageDto("쿠폰 발급 성공", HttpStatus.OK.value(), HttpStatus.OK.toString());
         return new ResponseDataDto<>(responseMessageDto);
     }
@@ -74,6 +81,18 @@ public class EventServiceImpl implements EventService {
     private void validateEmptyEvent(List<Event> event) {
         if (event.isEmpty()) {
             throw new IllegalArgumentException("현재 진행중인 이벤트가 없습니다.");
+        }
+    }
+
+    private void validateCreateCoupon(Event currentEvent, Long couponCount) {
+        if (couponCount >= currentEvent.getMaxMemberCount()) {
+            throw new IllegalArgumentException("You have exceeded the number of participants.");
+        }
+        if (couponCount != currentEvent.getCurrentMemberCount()){
+            throw new IllegalArgumentException("The number of coupons currently issued does not match the number of people.");
+        }
+        if (currentEvent.getEventStatus().equals(CLOSE)) {
+            throw new IllegalArgumentException("Event Close");
         }
     }
 
