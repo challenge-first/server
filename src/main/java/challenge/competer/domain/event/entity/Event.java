@@ -54,4 +54,12 @@ public class Event {
     public void updateCurrentMember() {
         this.currentMemberCount++;
     }
+
+    public void closeEventBeforeClosingTime(LocalDateTime now) {
+        this.eventStatus = EventStatus.CLOSE;
+        this.closingTime = now;
+    }
+    public void closeEventAtClosingTime() {
+        this.eventStatus = EventStatus.CLOSE;
+    }
 }
