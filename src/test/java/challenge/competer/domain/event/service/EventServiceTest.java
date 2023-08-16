@@ -21,13 +21,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static challenge.competer.domain.event.eventstatus.EventStatus.*;
-import static challenge.competer.domain.product.productenum.SubCategory.*;
-import static org.assertj.core.api.Assertions.*;
+import static challenge.competer.domain.event.eventstatus.EventStatus.CLOSE;
+import static challenge.competer.domain.event.eventstatus.EventStatus.OPEN;
+import static challenge.competer.domain.product.productenum.SubCategory.LG;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -171,5 +174,37 @@ class EventServiceTest {
         //then
         assertThatThrownBy(() -> eventService.createCoupon(event.getId(), memberDetails))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("현재 인원과 최대 인원이 같아지면 이벤트 종료 / 종료시간 변경")
+    public void equalToCurrentMember() throws Exception {
+        //given
+        LocalDateTime now = LocalDateTime.now();
+        Event event = Event.builder()
+                .id(1L)
+                .eventStatus(EventStatus.OPEN)
+                .currentMemberCount(1L)
+                .maxMemberCount(2L)
+                .closingTime(now.plusHours(1))
+                .build();
+
+        Member member = Member
+                .builder()
+                .id(1L)
+                .build();
+
+        MemberDetails memberDetails = new MemberDetails(member);
+
+        when(eventRepository.findById(any()))
+                .thenReturn(Optional.of(event));
+        when(couponRepository.countByEventId(any()))
+                .thenReturn(Optional.of(1L));
+
+        //when
+        eventService.createCoupon(event.getId(), memberDetails);
+
+        //then
+        assertThat(event.getEventStatus()).isEqualTo(CLOSE);
     }
 }
