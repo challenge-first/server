@@ -14,3 +14,7 @@ server:
   servlet:
     encoding:
       force: true
+
+event:
+  schedule:
+    cron: 0/2 * * * * *
