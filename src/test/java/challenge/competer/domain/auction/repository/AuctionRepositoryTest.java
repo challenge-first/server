@@ -23,9 +23,6 @@ public class AuctionRepositoryTest {
 
     @BeforeEach
     void beforeEach() {
-
-        auctionRepository.deleteAll();
-
         for (int i = 0; i < 5; i++) {
             Auction auction = Auction.builder()
                     .id((long) i + 1)
