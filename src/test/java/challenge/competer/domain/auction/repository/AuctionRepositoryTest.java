@@ -23,8 +23,12 @@ public class AuctionRepositoryTest {
 
     @BeforeEach
     void beforeEach() {
+
+        auctionRepository.deleteAll();
+
         for (int i = 0; i < 5; i++) {
             Auction auction = Auction.builder()
+                    .id((long) i + 1)
                     .openingTime(LocalDateTime.now().withHour(15).plusDays(i))
                     .closingTime(LocalDateTime.now().withHour(16).withMinute(59).plusDays(i))
                     .productId(1L)
