@@ -14,5 +14,4 @@ import static lombok.AccessLevel.PROTECTED;
 public class RequestAuctionDto {
 
     private Long point;
-    private LocalDateTime time;
 }
