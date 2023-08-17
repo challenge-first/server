@@ -45,8 +45,4 @@ public class Auction {
         this.winningPrice = winningPrice;
         this.memberId = memberId;
     }
-
-    public boolean hasEnded() {
-        return LocalDateTime.now().isAfter(closingTime);
-    }
 }

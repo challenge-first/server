@@ -88,7 +88,7 @@ public class AuctionServiceImpl implements AuctionService {
             throw new IllegalArgumentException("현재 입찰가보다 부족한 입찰 금액입니다");
         }
 
-        if (requestAuctionDto.getTime().isAfter(auction.getClosingTime())) {
+        if (LocalDateTime.now().isAfter(auction.getClosingTime())) {
             throw new IllegalStateException("경매가 종료되었습니다");
         }
 
