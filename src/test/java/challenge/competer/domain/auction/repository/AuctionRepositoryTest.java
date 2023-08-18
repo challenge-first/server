@@ -1,8 +1,6 @@
 package challenge.competer.domain.auction.repository;
 
 import challenge.competer.domain.auction.entity.Auction;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
@@ -23,12 +21,11 @@ public class AuctionRepositoryTest {
     AuctionRepository auctionRepository;
 
     @BeforeEach
-    void beforeAll() {
+    void beforeEach() {
         for (int i = 0; i < 5; i++) {
             Auction auction = Auction.builder()
-                    .id((long) i + 1)
-                    .openingTime(LocalDateTime.now().minusMinutes(1).plusHours(i))
-                    .closingTime(LocalDateTime.now().plusHours(1 + i))
+                    .openingTime(LocalDateTime.now().withHour(15).withMinute(0).withSecond(0).plusDays(i))
+                    .closingTime(LocalDateTime.now().withHour(16).withMinute(59).withSecond(0).plusDays(i))
                     .productId(1L)
                     .memberId(1L)
                     .openingPrice(100L)
@@ -40,15 +37,25 @@ public class AuctionRepositoryTest {
     }
 
     @Test
-    @DisplayName("현재 시간 기준 opening, closing 사이 값 조회 테스트")
+    @DisplayName("현재 시간 기준 참여가 가능한 경매 조회 테스트")
     public void findByCurrentTimeTest() throws Exception {
         //given, when
-        Optional<Auction> byCurrentTime = auctionRepository.findByCurrentTime(LocalDateTime.now());
+        Optional<Auction> byCurrentTime = auctionRepository.findByCurrentTime(LocalDateTime.now().withHour(15));
 
         //then
         assertThat(byCurrentTime.isPresent()).isTrue();
-        assertThat(byCurrentTime.get().getId()).isEqualTo(1L);
-        assertThat(byCurrentTime.get().getClosingTime()).isAfter(LocalDateTime.now());
-        assertThat(byCurrentTime.get().getOpeningTime()).isBefore(LocalDateTime.now());
+        assertThat(byCurrentTime.get().getOpeningTime()).isAfter(LocalDateTime.now().withHour(14).withMinute(59));
+        assertThat(byCurrentTime.get().getClosingTime()).isBefore(LocalDateTime.now().withHour(17));
+    }
+
+    @Test
+    @DisplayName("시작, 종료시간 기준 경매 조회 테스트")
+    public void findByClosingTimeBetweenTest() throws Exception {
+
+        Optional<Auction> byClosingTime = auctionRepository.findByClosingTimeBetween(LocalDateTime.now().withHour(15), LocalDateTime.now().withHour(16).withMinute(59));
+
+        assertThat(byClosingTime.isPresent()).isTrue();
+        assertThat(byClosingTime.get().getOpeningTime()).isAfter(LocalDateTime.now().withHour(14).withMinute(59));
+        assertThat(byClosingTime.get().getClosingTime()).isBefore(LocalDateTime.now().withHour(17));
     }
 }

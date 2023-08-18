@@ -40,6 +40,7 @@ class EventRepositoryTest {
                 .maxMemberCount(100L)
                 .currentMemberCount(0L)
                 .productStock(10000L)
+                .discountRate(10.0)
                 .openingTime(openingTime)
                 .closingTime(closingTime)
                 .eventStatus(EventStatus.OPEN)

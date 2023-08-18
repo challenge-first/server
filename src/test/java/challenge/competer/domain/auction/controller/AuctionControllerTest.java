@@ -53,6 +53,7 @@ class AuctionControllerTest {
     }
 
     @Test
+    @DisplayName("경매 조회 테스트")
     public void getAuction() throws Exception {
         //given
         when(auctionService.getAuction())
@@ -68,7 +69,7 @@ class AuctionControllerTest {
     }
 
     @Test
-    @DisplayName("Auction bid Test")
+    @DisplayName("경매 입찰 테스트")
     void bid() throws Exception {
 
         LocalDateTime time = LocalDateTime.now();

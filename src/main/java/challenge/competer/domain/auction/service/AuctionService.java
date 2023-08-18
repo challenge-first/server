@@ -7,6 +7,9 @@ import challenge.competer.domain.auction.dto.ResponseWinningPriceDto;
 import challenge.competer.global.auth.MemberDetails;
 
 public interface AuctionService {
+
+    void checkAndCloseAuctions();
+
     ResponseAuctionDto getAuction();
 
     ResponseWinningPriceDto bid(Long auctionId, RequestAuctionDto requestAuctionDto, MemberDetails memberDetails);

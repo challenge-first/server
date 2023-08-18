@@ -23,6 +23,7 @@ import static challenge.competer.domain.product.productenum.ProductState.IN_STOC
 import static challenge.competer.domain.product.productenum.SubCategory.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,15 +98,34 @@ class ProductServiceTest {
 
     @Test
     @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트")
-    void getCategoryPageProductsTest() {
+    void getCategoryProductsTest() {
         //given
+        List<String> subCategory = new ArrayList<>();
+        subCategory.add(LG.name());
+
         when(imageRepository.findFirstByProductId(any()))
                 .thenReturn(Optional.of(defaultImage));
         when(productRepository.findTop4ByCategory(any(), any()))
                 .thenReturn(productList);
 
         //when
-        List<ResponseProductDto> findResponseProductDtos = productServiceImpl.getCategoryPageProducts(LAPTOP.name(), LG.name());
+        List<ResponseProductDto> findResponseProductDtos = productServiceImpl.getCategoryProducts(LAPTOP.name(), subCategory);
+
+        //then
+        assertThat(findResponseProductDtos.size()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트-메인 카테고리 기준으로 조회")
+    void emptySubCategoryGetCategoryProductsTest() {
+        //given
+        when(imageRepository.findFirstByProductId(any()))
+                .thenReturn(Optional.of(defaultImage));
+        when(productRepository.findTop4ByMainCategory(any()))
+                .thenReturn(productList);
+
+        //when
+        List<ResponseProductDto> findResponseProductDtos = productServiceImpl.getCategoryProducts(LAPTOP.name(), null);
 
         //then
         assertThat(findResponseProductDtos.size()).isEqualTo(4);
@@ -113,24 +133,28 @@ class ProductServiceTest {
 
     @Test
     @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트 - 잘못된 메인 카테고리 이름")
-    void wrongMainCategoryNameGetCategoryPageProductsTest() {
+    void wrongMainCategoryNameGetCategoryProductsTest() {
         //given
+        List<String> subCategory = new ArrayList<>();
+        subCategory.add(LG.name());
         String wrongCategoryName = "LAPTOPPPPP";
 
         //when, then
-        assertThatThrownBy(() -> productServiceImpl.getCategoryPageProducts(wrongCategoryName, LG.name()))
+        assertThatThrownBy(() -> productServiceImpl.getCategoryProducts(wrongCategoryName, subCategory))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 메인 카테고리는 없는 카테고리입니다.");
     }
 
     @Test
     @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트 - 잘못된 서브 카테고리 이름")
-    void wrongSubCategoryNameGetCategoryPageProductsTest() {
+    void wrongSubCategoryNameGetCategoryProductsTest() {
         //given
+        List<String> subCategory = new ArrayList<>();
         String wrongCategoryName = "LAPTOPPPPP";
+        subCategory.add(wrongCategoryName);
 
         //when, then
-        assertThatThrownBy(() -> productServiceImpl.getCategoryPageProducts(LAPTOP.name(), wrongCategoryName))
+        assertThatThrownBy(() -> productServiceImpl.getCategoryProducts(LAPTOP.name(), subCategory))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 서브 카테고리는 없는 카테고리입니다.");
     }

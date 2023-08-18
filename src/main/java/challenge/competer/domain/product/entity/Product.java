@@ -42,6 +42,9 @@ public class Product {
     @Column(nullable = false)
     private Integer likeCount;
 
+    @Column(nullable = false)
+    private String image;
+
     @Enumerated(STRING)
     @Column(nullable = false)
     private ProductState productState;
@@ -59,13 +62,14 @@ public class Product {
     private ProductType productType;
 
     @Builder
-    public Product(String name, Integer price, String content, Integer stockCount, ProductState productState, SubCategory subCategory, ProductType productType) {
+    public Product(String name, Integer price, String content, Integer stockCount, String image, ProductState productState, SubCategory subCategory, ProductType productType) {
         this.id = null;
         this.name = name;
         this.price = price;
         this.content = content;
         this.stockCount = stockCount;
         this.likeCount = 0;
+        this.image = image;
         this.productState = productState;
         this.mainCategory = subCategory.getParentCategory();
         this.subCategory = subCategory;

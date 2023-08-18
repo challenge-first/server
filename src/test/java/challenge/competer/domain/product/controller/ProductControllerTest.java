@@ -2,6 +2,7 @@ package challenge.competer.domain.product.controller;
 
 import challenge.competer.domain.product.dto.ResponseDetailProductDto;
 import challenge.competer.domain.product.dto.ResponseProductDto;
+import challenge.competer.domain.product.productenum.MainCategory;
 import challenge.competer.domain.product.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,13 +12,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static challenge.competer.domain.product.productenum.MainCategory.*;
-import static challenge.competer.domain.product.productenum.SubCategory.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -62,14 +63,29 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트")
+    @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트-서브 카테고리 있음")
     void getCategoryProductsTest() throws Exception {
         //given
-        when(productService.getCategoryPageProducts(LAPTOP.name(), LG.name()))
-                .thenReturn(responseProductDtos);
+        when(productService.getCategoryProducts(any(), anyList())).thenReturn(responseProductDtos);
 
         //when, then
-        mockMvc.perform(get("/products/main/maincategory/LAPTOP/subcategory/LG"))
+        mockMvc.perform(get("/products/maincategory/LAPTOP?subcategory=LG&subcategory=APPLE"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("data").exists())
+                .andExpect(jsonPath("data").isArray())
+                .andExpect(jsonPath("data.length()").value(4));
+    }
+
+    @Test
+    @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트-서브 카테고리 없음")
+    void noSubCategoryParameterGetCategoryProductsTest() throws Exception {
+        //given
+        when(productService.getCategoryProducts(LAPTOP.name(), null)).thenReturn(responseProductDtos);
+
+        //when, then
+        mockMvc.perform(get("/products/maincategory/LAPTOP"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))

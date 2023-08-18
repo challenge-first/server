@@ -32,6 +32,7 @@ class ProductRepositoryTest {
                     .price(i)
                     .content("content" + i)
                     .stockCount(i)
+                    .image("i")
                     .productState(IN_STOCK)
                     .subCategory(LG)
                     .productType(PRODUCT)
