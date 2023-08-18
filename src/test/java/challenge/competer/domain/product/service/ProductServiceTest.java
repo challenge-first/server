@@ -4,6 +4,7 @@ import challenge.competer.domain.image.entity.Image;
 import challenge.competer.domain.product.dto.ResponseDetailProductDto;
 import challenge.competer.domain.product.dto.ResponseProductDto;
 import challenge.competer.domain.product.entity.Product;
+import challenge.competer.domain.product.productenum.ProductState;
 import challenge.competer.domain.product.repository.ImageRepository;
 import challenge.competer.domain.product.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,8 +84,6 @@ class ProductServiceTest {
     @DisplayName("메인 페이지 상품 4개 내림차순 조회 테스트")
     void getMainPageProductsTest() {
         //given
-        when(imageRepository.findFirstByProductId(any()))
-                .thenReturn(Optional.of(defaultImage));
         when(productRepository.findTop4ByOrderByIdDesc())
                 .thenReturn(productList);
 
@@ -103,8 +102,6 @@ class ProductServiceTest {
         List<String> subCategory = new ArrayList<>();
         subCategory.add(LG.name());
 
-        when(imageRepository.findFirstByProductId(any()))
-                .thenReturn(Optional.of(defaultImage));
         when(productRepository.findTop4ByCategory(any(), any()))
                 .thenReturn(productList);
 
@@ -119,8 +116,6 @@ class ProductServiceTest {
     @DisplayName("카테고리 페이지 상품 4개 내림차순 조회 테스트-메인 카테고리 기준으로 조회")
     void emptySubCategoryGetCategoryProductsTest() {
         //given
-        when(imageRepository.findFirstByProductId(any()))
-                .thenReturn(Optional.of(defaultImage));
         when(productRepository.findTop4ByMainCategory(any()))
                 .thenReturn(productList);
 
@@ -163,22 +158,14 @@ class ProductServiceTest {
     @DisplayName("상품 상세조회 테스트")
     void getDetailProductTest() {
         //given
-        List<Image> images = new ArrayList<>();
-        images.add(defaultImage);
-        images.add(subImage1);
-        images.add(subImage2);
-
-        when(imageRepository.findAllByProductId(any()))
-                .thenReturn(images);
         when(productRepository.findById(any()))
                 .thenReturn(Optional.ofNullable(productList.get(0)));
 
         //when
-        List<String> imageUrls = productServiceImpl.getDetailProduct(any()).getImageUrl();
+        ResponseDetailProductDto detailProduct = productServiceImpl.getDetailProduct(any());
 
         //then
-        assertThat(imageUrls.size()).isEqualTo(3);
-        assertThat(imageUrls.get(0)).isEqualTo("url");
+        assertThat(detailProduct.getProductState()).isEqualTo(IN_STOCK);
     }
 
 }
