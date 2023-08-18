@@ -53,6 +53,7 @@ class LikeRepositoryTest {
                 .price(10000)
                 .content("content")
                 .stockCount(10)
+                .image("image")
                 .productState(IN_STOCK)
                 .subCategory(APPLE)
                 .productType(PRODUCT)

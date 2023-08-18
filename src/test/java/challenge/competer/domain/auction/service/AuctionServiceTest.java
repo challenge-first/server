@@ -119,8 +119,6 @@ class AuctionServiceTest {
         //given
         when(productRepository.findById(any()))
                 .thenReturn(Optional.of(product));
-        when(imageRepository.findFirstByProductId(any()))
-                .thenReturn(Optional.of(image));
         when(auctionRepository.findByCurrentTime(any()))
                 .thenReturn(Optional.of(auction));
 
