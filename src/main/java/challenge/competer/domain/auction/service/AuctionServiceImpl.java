@@ -27,7 +27,6 @@ public class AuctionServiceImpl implements AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
-    private final ImageRepository imageRepository;
     private final MemberRepository memberRepository;
 
     @Override
@@ -39,16 +38,13 @@ public class AuctionServiceImpl implements AuctionService {
         Product product = productRepository.findById(auction.getProductId()).orElseThrow(
                 () -> new IllegalArgumentException("해당 상품이 없습니다."));
 
-        Image image = imageRepository.findFirstByProductId(product.getId()).orElseThrow(
-                () -> new IllegalArgumentException("이미지가 없습니다."));
-
         ResponseAuctionDto responseDto = ResponseAuctionDto.builder()
                 .id(auction.getId())
                 .name(product.getName())
                 .winningPrice(auction.getWinningPrice())
                 .openingPrice(auction.getOpeningPrice())
                 .openingTime(auction.getOpeningTime())
-                .imageUrl(image.getImageUrl())
+                .imageUrl(product.getImage())
                 .closingTime(auction.getClosingTime())
                 .build();
 
