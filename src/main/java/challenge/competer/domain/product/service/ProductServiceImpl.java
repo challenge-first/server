@@ -21,13 +21,14 @@ import java.util.stream.Stream;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final ImageRepository imageRepository;
 
     @Override
     public List<ResponseProductDto> getMainPageProducts() {
         List<Product> findProducts = productRepository.findTop4ByOrderByIdDesc();
 
-        return generateResponseProductDtos(findProducts);
+        return findProducts.stream()
+                .map(this::createResponseProductDto)
+                .toList();
     }
 
     @Override
@@ -39,28 +40,21 @@ public class ProductServiceImpl implements ProductService {
         if (optionalSubCategory.isEmpty()) {
             List<Product> findProducts = productRepository.findTop4ByMainCategory(enumMainCategory);
 
-            return generateResponseProductDtos(findProducts);
+            return findProducts.stream()
+                    .map(this::createResponseProductDto)
+                    .toList();
         }
 
         subCategory.forEach(category -> {
             SubCategory enumSubCategory = getEnumSubCategory(category);
             List<Product> findProducts = productRepository.findTop4ByCategory(enumMainCategory, enumSubCategory);
-            List<ResponseProductDto> responseProductDtos = generateResponseProductDtos(findProducts);
+            List<ResponseProductDto> responseProductDtos = findProducts.stream()
+                    .map(this::createResponseProductDto)
+                    .toList();
             resultResponseProductDtos.addAll(responseProductDtos);
         });
 
         return resultResponseProductDtos;
-    }
-
-    private List<ResponseProductDto> generateResponseProductDtos(List<Product> findProducts) {
-        return findProducts.stream()
-                .map(product -> {
-                    Image findImage = imageRepository.findFirstByProductId(product.getId())
-                            .orElseThrow(() -> new IllegalArgumentException("이미지가 없습니다."));
-
-                    return createResponseProductDto(product, findImage);
-                })
-                .toList();
     }
 
     private MainCategory getEnumMainCategory(String mainCategory) {
@@ -79,40 +73,32 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    private ResponseProductDto createResponseProductDto(Product product, Image findImage) {
+    private ResponseProductDto createResponseProductDto(Product product) {
         return ResponseProductDto.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
                 .productState(product.getProductState())
                 .likeCount(product.getLikeCount())
-                .imageUrl(findImage.getImageUrl())
+                .imageUrl(product.getImage())
                 .build();
     }
 
     @Override
     public ResponseDetailProductDto getDetailProduct(Long productId) {
         Product findProduct = productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("상품이 없습니다."));
-        List<Image> findImages = imageRepository.findAllByProductId(productId);
-        List<String> images = new ArrayList<>();
 
-        if (findImages.isEmpty()) {
-            throw new IllegalArgumentException("이미지가 없습니다.");
-        }
-
-        findImages.forEach(image -> images.add(image.getImageUrl()));
-
-        return createResponseDetailProductDto(findProduct, images);
+        return createResponseDetailProductDto(findProduct);
     }
 
-    private static ResponseDetailProductDto createResponseDetailProductDto(Product findProduct, List<String> images) {
+    private static ResponseDetailProductDto createResponseDetailProductDto(Product findProduct) {
         return ResponseDetailProductDto.builder()
                 .name(findProduct.getName())
                 .price(findProduct.getPrice())
                 .content(findProduct.getContent())
                 .stockCount(findProduct.getStockCount())
                 .productState(findProduct.getProductState())
-                .imageUrl(images)
+                .imageUrl(findProduct.getImage())
                 .likeCount(findProduct.getLikeCount())
                 .build();
     }
