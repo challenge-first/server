@@ -13,4 +13,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("select e from Event e where e.openingTime < :currentTime and e.closingTime > :currentTime order by e.id desc")
     List<Event> findOpenEvent(@Param("currentTime") LocalDateTime currentTime, Pageable pageable);
+
+    @Query("select e from Event e where e.eventStatus = 'OPEN'")
+    List<Event> findEventsByEventStatus();
 }

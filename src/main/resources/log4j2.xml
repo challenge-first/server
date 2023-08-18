@@ -98,7 +98,7 @@
 
         <!-- ROOT logger-->
         <!-- off, fatal, error, warn, info, debug, trace, all -->
-        <Root level="error" additivity="false">
+        <Root level="debug" additivity="false">
             <AppenderRef ref="File"/>
             <AppenderRef ref="AOPFile" />
             <AppenderRef ref="console" />

@@ -2,6 +2,7 @@ package challenge.competer.domain.event.repository;
 
 import challenge.competer.domain.event.entity.Event;
 import challenge.competer.domain.event.eventstatus.EventStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 @SpringBootTest
 @Transactional
+@Slf4j(topic = "eventRepositoryTest")
 class EventRepositoryTest {
 
     LocalDateTime openingTime;
@@ -42,6 +44,7 @@ class EventRepositoryTest {
                 .openingTime(openingTime)
                 .closingTime(closingTime)
                 .eventStatus(EventStatus.OPEN)
+                .discountRate(0.1)
                 .build();
 
         eventRepository.save(event);
@@ -75,4 +78,34 @@ class EventRepositoryTest {
         Assertions.assertThat(findEvent.size()).isEqualTo(0);
     }
 
+    @Test
+    @DisplayName("이미 종료되야 할 이벤트 status 변경")
+    public void findOpenEventAfterClosingTime() throws Exception {
+        //given
+        openingTime = LocalDateTime.now().minusMinutes(10);
+        closingTime = openingTime.plusSeconds(10);
+
+        Event event = Event.builder()
+                .id(2L)
+                .productId(2L)
+                .maxMemberCount(100L)
+                .currentMemberCount(0L)
+                .productStock(10000L)
+                .openingTime(openingTime)
+                .closingTime(closingTime)
+                .eventStatus(EventStatus.OPEN)
+                .discountRate(0.1)
+                .build();
+
+        eventRepository.save(event);
+
+        //when
+        List<Event> eventsByEventStatus = eventRepository.findEventsByEventStatus();
+
+        //then
+        Event event1 = eventsByEventStatus.get(1);
+
+        Assertions.assertThat(event1.getEventStatus()).isEqualTo(EventStatus.OPEN);
+        Assertions.assertThat(event1.getClosingTime()).isBefore(LocalDateTime.now());
+    }
 }
