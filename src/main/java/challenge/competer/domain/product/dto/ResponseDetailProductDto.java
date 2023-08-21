@@ -22,7 +22,7 @@ public class ResponseDetailProductDto {
     private String content;
     private Integer stockCount;
     private ProductState productState;
-    private List<String> imageUrl = new ArrayList<>();
+    private String imageUrl;
     private Integer likeCount;
 
 }

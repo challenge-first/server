@@ -98,7 +98,7 @@ class ProductControllerTest {
     @DisplayName("상품 상세조회 테스트")
     void getDetailProductTest() throws Exception {
         //given
-        ResponseDetailProductDto responseDetailProductDto = ResponseDetailProductDto.builder().imageUrl(new ArrayList<>()).build();
+        ResponseDetailProductDto responseDetailProductDto = ResponseDetailProductDto.builder().build();
         when(productService.getDetailProduct(any()))
                 .thenReturn(responseDetailProductDto);
 
@@ -107,9 +107,7 @@ class ProductControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("data").exists())
-                .andExpect(jsonPath("data.imageUrl").exists())
-                .andExpect(jsonPath("data.imageUrl").isArray());
+                .andExpect(jsonPath("data").exists());
     }
 
 }
